@@ -23,9 +23,14 @@ def generate_or_proof(m, C, c, r):
             r: randomness vector used to create c
 
         Returns:
-            two response vectors (r0, r1) and two challenge polynomials (f0, f1)
+            two response vectors (r0, r1)
+            two challenge polynomials (f0, f1)
+            amounts of attempts needed to create the proof
     """
+    attempts = 0
     while True:
+        attempts += 1
+
         # (1) Sample fake randomness
         r_fake = sample_randomness(SIGMA_OR)  # r_{1-m}
 
@@ -61,7 +66,7 @@ def generate_or_proof(m, C, c, r):
         if rejection_sample_keep(r_honest, f_honest, r):
             break
 
-        print("Aborted (Rejection sampling)")
+        # print("Aborted (Rejection sampling)")
 
     # (10) Output the proof
     if m == 0:
@@ -71,7 +76,7 @@ def generate_or_proof(m, C, c, r):
         r0, r1 = r_fake, r_honest
         f0, f1 = f_fake, f_honest
 
-    return r0, r1, f0, f1
+    return r0, r1, f0, f1, attempts
 
 
 # --------------------------------------------------------
