@@ -32,5 +32,5 @@ paper.
 
 - Rafaël del Pino, Vadim Lyubashevsky, Gregory Neven, and
   Gregor Seiler. 2017. Practical Quantum-Safe Voting from Lattices. In Proceedings of the 2017 ACM SIGSAC Conference
-  on Computer and Communications Security (CCS '17). Association for Computing Machinery, New York, NY, USA, 1565–1581.
+  on Computer and Communications Security (CCS '17). Association for Computing Machinery, New York, NY, USA, 1565-1581.
   https://doi.org/10.1145/3133956.3134101
