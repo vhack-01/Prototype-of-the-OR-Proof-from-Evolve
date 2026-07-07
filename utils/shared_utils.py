@@ -1,5 +1,6 @@
 import struct
 import hashlib
+from math import sqrt
 
 import sage.all as sg
 from sage.stats.distributions.discrete_gaussian_integer import DiscreteGaussianDistributionIntegerSampler
@@ -166,3 +167,16 @@ def serialize_rq_vector(vec):
     for poly in vec:
         data += struct.pack('<' + 'i' * N, *[int(center_coefficient(c)) for c in poly.list()])
     return data
+
+
+def norm_rq_vector(vec):
+    """
+        Compute the Euclidean norm of a vector of polynomials in Rq
+
+        Args:
+            vec: vector over Rq
+
+        Returns:
+            Euclidean norm of vec
+    """
+    return sqrt(sum(center_coefficient(c) ** 2 for poly in vec for c in poly.list()))

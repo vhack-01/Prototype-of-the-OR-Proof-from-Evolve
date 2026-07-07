@@ -2,17 +2,16 @@ import time
 import struct
 from datetime import datetime
 
-import sage.all as sg
-
-from commitment.commitment import generate_commitment
+from commitment.commitment import generate_commitment_key, commit
 from or_proof.prover import generate_or_proof
 from or_proof.verifier import verify_or_proof
 from simulate_or_proof import simulate_or_proof
-from utils.shared_utils import center_coefficient, serialize_rq_vector
+from utils.shared_utils import serialize_rq_vector, center_coefficient
+from config.params import N_A
 
 
 # --------------------------------------------------------
-#  Functions for benchmarking
+#  Functions for Benchmarking
 # --------------------------------------------------------
 
 def serialize_challenge(f):
@@ -44,16 +43,48 @@ def serialize_challenge(f):
 
 def benchmark_proof_size():
     """
-        Run benchmarking for the proof size.
+    Measure the size of a voter's complete contribution to the bulletin board and compare with the paper's numbers.
     """
-    print("Benchmarking proof size")
-    # Each proof has the same size, so running it once is enough.
-    C, c, r = generate_commitment(0)
+    print("Benchmarking voter-side sizes")
+
+    # Generate one commitment and its OR-proof (size is independent of message)
+    C = generate_commitment_key()
+    c, r = commit(C, 0)
     r0, r1, f0, f1, _ = generate_or_proof(0, C, c, r)
 
-    proof_bytes = serialize_rq_vector(r0) + serialize_rq_vector(r1) + serialize_challenge(f0) + serialize_challenge(f1)
+    # ---------- Sizes of individual components ----------
+    # Size of one commitment (vector of d+1 polynomials)
+    commitment_bytes = serialize_rq_vector(c)
+    commitment_size = len(commitment_bytes)
+    print(f"    Commitment size (per authority): {commitment_size:.0f} bytes ({commitment_size / 1024:.1f} KB)")
+
+    # Size of the OR-proof (r0, r1, f0, f1)
+    proof_bytes = (serialize_rq_vector(r0) +
+                   serialize_rq_vector(r1) +
+                   serialize_challenge(f0) +
+                   serialize_challenge(f1))
     proof_size = len(proof_bytes)
-    print(f"    Proof size: {proof_size:.0f} bytes ({proof_size / 1024:.1f} KB)")
+    print(f"    OR‑proof size: {proof_size:.0f} bytes ({proof_size / 1024:.1f} KB)")
+
+    # ---------- Voter totals ----------
+    total = N_A * commitment_size + proof_size
+    avg_per_authority_no_cipher = total / N_A
+
+    print(f"\nVoter contribution ({N_A} commitments + OR‑proof):")
+    print(f"    Total size: {total:.0f} bytes ({total / 1024:.1f} KB)")
+    print(
+        f"    Average per authority: {avg_per_authority_no_cipher:.0f} bytes ({avg_per_authority_no_cipher / 1024:.1f} KB)")
+
+    # ---------- Include ciphertexts and digital signature ----------
+    ciphertext_size = 1568  # Kyber-1024
+    signature_bytes = 4627  # ML-DSA-87
+    total_estimated = total + N_A * ciphertext_size + signature_bytes
+    avg_with_cipher = total_estimated / N_A
+
+    print(f"\nIncluding ciphertexts and digital signature (estimated):")
+    print(f"    Total voter ballot: {total_estimated:.0f} bytes ({total_estimated / 1024:.1f} KB)")
+    print(f"    Average per authority: {avg_with_cipher:.0f} bytes ({avg_with_cipher / 1024:.1f} KB)")
+    print("    (Paper reports ~78 KB total and ~20 KB per authority)")
 
 
 def benchmark_run_times(iterations=1000):
@@ -68,21 +99,20 @@ def benchmark_run_times(iterations=1000):
 
     times_prover = []
     times_verifier = []
-    attempts_counter = 0
 
     # Warm-up
     for _ in range(3):
         simulate_or_proof(0)
 
     for _ in range(iterations):
-        C, c, r = generate_commitment(0)
+        C = generate_commitment_key()
+        c, r = commit(C, 0)
 
         # Measure generation time
         gen_start = time.perf_counter()
         r0, r1, f0, f1, attempts = generate_or_proof(0, C, c, r)
         gen_end = time.perf_counter()
         times_prover.append(gen_end - gen_start)
-        attempts_counter += attempts
 
         # Measure verification time
         verify_start = time.perf_counter()
@@ -95,12 +125,10 @@ def benchmark_run_times(iterations=1000):
     # Calculate averages
     avg_time_prover = sum(times_prover) / len(times_prover)
     avg_time_verifier = sum(times_verifier) / len(times_verifier)
-    avg_attempts = attempts_counter / iterations
 
     # Output results
     print(f"    Average proof generation time: {avg_time_prover:.6f}s")
     print(f"    Average proof verification time: {avg_time_verifier:.6f}s")
-    print(f"    Average attempts needed to generate a proof: {avg_attempts:.2f}")
 
     current_time_end = datetime.now().strftime("%H:%M:%S")
     print("Benchmarking of run times finished at", current_time_end)
@@ -108,4 +136,4 @@ def benchmark_run_times(iterations=1000):
 
 if __name__ == "__main__":
     benchmark_proof_size()
-    benchmark_run_times()
+    # benchmark_run_times()
