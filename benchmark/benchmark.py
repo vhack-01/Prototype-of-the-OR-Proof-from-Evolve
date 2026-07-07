@@ -74,16 +74,6 @@ def benchmark_proof_size():
     print(f"    Total size: {total:.0f} bytes ({total / 1024:.1f} KB)")
     print(
         f"    Average per authority: {avg_per_authority_no_cipher:.0f} bytes ({avg_per_authority_no_cipher / 1024:.1f} KB)")
-
-    # ---------- Include ciphertexts and digital signature ----------
-    ciphertext_size = 1568  # Kyber-1024
-    signature_bytes = 4627  # ML-DSA-87
-    total_estimated = total + N_A * ciphertext_size + signature_bytes
-    avg_with_cipher = total_estimated / N_A
-
-    print(f"\nIncluding ciphertexts and digital signature (estimated):")
-    print(f"    Total voter ballot: {total_estimated:.0f} bytes ({total_estimated / 1024:.1f} KB)")
-    print(f"    Average per authority: {avg_with_cipher:.0f} bytes ({avg_with_cipher / 1024:.1f} KB)")
     print("    (Paper reports ~78 KB total and ~20 KB per authority)")
 
 
@@ -97,6 +87,7 @@ def benchmark_run_times(iterations=1000):
     current_time_start = datetime.now().strftime("%H:%M:%S")
     print(f"Benchmarking of run times started at {current_time_start} | Running {iterations} iterations")
 
+    times_commitment = []
     times_prover = []
     times_verifier = []
 
@@ -105,8 +96,11 @@ def benchmark_run_times(iterations=1000):
         simulate_or_proof(0)
 
     for _ in range(iterations):
+        commit_start = time.perf_counter()
         C = generate_commitment_key()
         c, r = commit(C, 0)
+        commit_end = time.perf_counter()
+        times_commitment.append(commit_end - commit_start)
 
         # Measure generation time
         gen_start = time.perf_counter()
@@ -123,10 +117,12 @@ def benchmark_run_times(iterations=1000):
         assert is_valid, "Proof verification failed"
 
     # Calculate averages
+    avg_time_commitment = sum(times_commitment) / len(times_commitment)
     avg_time_prover = sum(times_prover) / len(times_prover)
     avg_time_verifier = sum(times_verifier) / len(times_verifier)
 
     # Output results
+    print(f"    Average commitment time: {avg_time_commitment:.6f}s")
     print(f"    Average proof generation time: {avg_time_prover:.6f}s")
     print(f"    Average proof verification time: {avg_time_verifier:.6f}s")
 
@@ -136,4 +132,4 @@ def benchmark_run_times(iterations=1000):
 
 if __name__ == "__main__":
     benchmark_proof_size()
-    # benchmark_run_times()
+    benchmark_run_times(100)

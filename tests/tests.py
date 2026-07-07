@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import sage.all as sg
 from commitment.commitment import open, commit, generate_commitment_key
 from or_proof.prover import generate_or_proof
@@ -188,6 +190,8 @@ def test_rejection_sampling(iterations=1000):
             iterations: number of OR-proofs to simulate
     """
     print(f"Simulating {iterations} OR-proofs to test rejection sampling...")
+    current_time_start = datetime.now().strftime("%H:%M:%S")
+    print(f"Benchmarking of run times started at {current_time_start} | Running {iterations} iterations")
 
     attempts_counter = 0
 
@@ -212,6 +216,8 @@ def test_rejection_sampling(iterations=1000):
 
     # Output results
     print(f"    Average attempts needed to generate a proof: {avg_attempts:.2f}")
+    current_time_end = datetime.now().strftime("%H:%M:%S")
+    print("Benchmarking of run times finished at", current_time_end)
 
 
 if __name__ == "__main__":
@@ -231,7 +237,7 @@ if __name__ == "__main__":
     test_invalid_proof(346334343)
 
     # These tests may run a long time depending on the chosen amount of iterations
-    # test_random_valid_proofs()
-    # test_rejection_sampling()
+    test_random_valid_proofs(100)
+    test_rejection_sampling(100)
 
     print("All tests passed!")
