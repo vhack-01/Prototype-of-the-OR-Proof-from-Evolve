@@ -237,7 +237,7 @@ if __name__ == "__main__":
     test_invalid_proof(346334343)
 
     # These tests may run a long time depending on the chosen amount of iterations
-    test_random_valid_proofs(100)
-    test_rejection_sampling(100)
+    test_random_valid_proofs()
+    test_rejection_sampling()
 
     print("All tests passed!")

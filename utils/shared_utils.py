@@ -5,13 +5,16 @@ from math import sqrt
 import sage.all as sg
 from sage.stats.distributions.discrete_gaussian_integer import DiscreteGaussianDistributionIntegerSampler
 
-from config.params import D, N, Q
+from config.params import D, N, Q, SIGMA_OR, SIGMA_COMMITMENT
 from config.ring import Rq
-
 
 # --------------------------------------------------------
 #  Helper functions for the Commitment, Prover and Verifier
 # --------------------------------------------------------
+
+commitment_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_COMMITMENT)
+proof_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_OR)
+
 
 def center_coefficient(c):
     """
@@ -29,35 +32,34 @@ def center_coefficient(c):
     return c_int if c_int <= half_q else c_int - Q  # center c if needed
 
 
-def sample_discrete_gaussian_vector(sigma):
+def sample_discrete_gaussian_vector(sampler):
     """
         Sample a vector of length N(2D+1) from the discrete Gaussian distribution with standard deviation sigma
         (using Sage's DiscreteGaussianDistributionIntegerSampler). This is acceptable for prototyping, but not for
         production because it is susceptible to side-channel attacks.
 
         Args:
-            sigma: standard deviation of the Gaussian distribution
+            sampler: Gaussian distribution sampler
 
         Returns:
             vector over ZZ
     """
     dim = N * (2 * D + 1)
-    sampler = DiscreteGaussianDistributionIntegerSampler(sigma=sigma)
     return sg.vector(sg.ZZ, [sampler() for _ in range(dim)])
 
 
-def sample_randomness(sigma):
+def sample_randomness(sampler):
     """
         Sample a vector of length N(2D+1) whose components are polynomials in Rq. The coefficients of each polynomial
         are drawn from a discrete Gaussian distribution with standard deviation sigma.
 
         Args:
-            sigma: standard deviation of the Gaussian distribution
+            sampler: the sampler to use
 
         Returns:
             vector over Rq
     """
-    coeffs_list = sample_discrete_gaussian_vector(sigma).list()
+    coeffs_list = sample_discrete_gaussian_vector(sampler).list()
 
     chunks = [coeffs_list[i:i + N] for i in range(0, len(coeffs_list), N)]
     r_polys = [Rq(chunk) for chunk in chunks]

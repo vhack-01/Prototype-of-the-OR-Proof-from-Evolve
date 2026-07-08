@@ -1,8 +1,8 @@
 import sage.all as sg
 
 from config.ring import Rq
-from config.params import D, SIGMA_COMMITMENT
-from utils.shared_utils import sample_randomness, norm_rq_vector, center_coefficient
+from config.params import D
+from utils.shared_utils import sample_randomness, norm_rq_vector, center_coefficient, commitment_sampler
 from config.params import B_R
 
 
@@ -38,7 +38,7 @@ def commit(C, m):  # Commit
             the commitment vector (length D+1)
             the randomness vector (length 2D+1)
     """
-    r = sample_randomness(SIGMA_COMMITMENT)
+    r = sample_randomness(commitment_sampler)
     v: sg.vector = sg.vector(Rq, [0] * D + [m])
     c = C * r + v
     return c, r

@@ -3,9 +3,10 @@ from math import exp
 
 import sage.all as sg
 
-from config.params import N, D, Q, SIGMA_OR
+from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import hash_to_challenge, apply_permutation, sample_randomness, center_coefficient
+from utils.shared_utils import hash_to_challenge, apply_permutation, sample_randomness, center_coefficient, \
+    proof_sampler
 
 
 # --------------------------------------------------------
@@ -32,7 +33,7 @@ def generate_or_proof(m, C, c, r):
         attempts += 1
 
         # (1) Sample fake randomness
-        r_fake = sample_randomness(SIGMA_OR)  # r_{1-m}
+        r_fake = sample_randomness(proof_sampler)  # r_{1-m}
 
         # (2) Generate fake challenge polynomial
         f_fake = generate_challenge_polynomial()  # f_{1-m}
@@ -41,7 +42,7 @@ def generate_or_proof(m, C, c, r):
         t_fake = compute_fake_commitment(m, C, c, r_fake, f_fake)  # t_{1-m}
 
         # (4) Sample honest randomness
-        rho = sample_randomness(SIGMA_OR)
+        rho = sample_randomness(proof_sampler)
 
         # (5) Compute honest commitment
         t_honest = C * rho  # t_{m}

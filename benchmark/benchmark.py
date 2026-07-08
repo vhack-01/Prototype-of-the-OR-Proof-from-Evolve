@@ -53,10 +53,8 @@ def benchmark_proof_size():
     r0, r1, f0, f1, _ = generate_or_proof(0, C, c, r)
 
     # ---------- Sizes of individual components ----------
-    # Size of one commitment (vector of d+1 polynomials)
-    commitment_bytes = serialize_rq_vector(c)
-    commitment_size = len(commitment_bytes)
-    print(f"    Commitment size (per authority): {commitment_size:.0f} bytes ({commitment_size / 1024:.1f} KB)")
+    commitment_size = len(serialize_rq_vector(c))
+    print(f"    Commitment size (per authority): {commitment_size / 1024:.1f} KB")
 
     # Size of the OR-proof (r0, r1, f0, f1)
     proof_bytes = (serialize_rq_vector(r0) +
@@ -64,16 +62,15 @@ def benchmark_proof_size():
                    serialize_challenge(f0) +
                    serialize_challenge(f1))
     proof_size = len(proof_bytes)
-    print(f"    OR‑proof size: {proof_size:.0f} bytes ({proof_size / 1024:.1f} KB)")
+    print(f"    OR‑proof size: {proof_size / 1024:.1f} KB")
 
     # ---------- Voter totals ----------
     total = N_A * commitment_size + proof_size
     avg_per_authority_no_cipher = total / N_A
 
     print(f"\nVoter contribution ({N_A} commitments + OR‑proof):")
-    print(f"    Total size: {total:.0f} bytes ({total / 1024:.1f} KB)")
-    print(
-        f"    Average per authority: {avg_per_authority_no_cipher:.0f} bytes ({avg_per_authority_no_cipher / 1024:.1f} KB)")
+    print(f"    Total size: {total / 1024:.1f} KB")
+    print(f"    Average per authority: {avg_per_authority_no_cipher / 1024:.1f} KB")
     print("    (Paper reports ~78 KB total and ~20 KB per authority)")
 
 
@@ -132,4 +129,4 @@ def benchmark_run_times(iterations=1000):
 
 if __name__ == "__main__":
     benchmark_proof_size()
-    benchmark_run_times(100)
+    benchmark_run_times()
