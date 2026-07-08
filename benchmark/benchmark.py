@@ -119,9 +119,15 @@ def benchmark_run_times(iterations=1000):
     avg_time_verifier = sum(times_verifier) / len(times_verifier)
 
     # Output results
-    print(f"    Average commitment time: {avg_time_commitment:.6f}s")
-    print(f"    Average proof generation time: {avg_time_prover:.6f}s")
-    print(f"    Average proof verification time: {avg_time_verifier:.6f}s")
+    print(f"    Average commitment time: {avg_time_commitment:.6f} s")
+    print(f"    Average proof generation time: {avg_time_prover:.6f} s")
+    print(f"    Average proof verification time: {avg_time_verifier:.6f} s")
+
+    # Compare to paper
+    voter_time = avg_time_prover + N_A * avg_time_commitment
+    print(f"\nVoter time ({N_A} commitments + OR‑proof):")
+    print(f"    Total time: {voter_time:.6f}s")
+    print("    (Paper reports ~8.5 ms)")
 
     current_time_end = datetime.now().strftime("%H:%M:%S")
     print("Benchmarking of run times finished at", current_time_end)
