@@ -14,32 +14,6 @@ from config.params import N_A
 #  Functions for Benchmarking
 # --------------------------------------------------------
 
-def serialize_challenge(f):
-    """
-        Serialize a challenge polynomial.
-
-        Args:
-            f: challenge polynomial
-
-        Returns:
-            serialized polynomial as 60 indices (2 bytes each) followed by a 8‑byte sign mask
-    """
-    coeffs = f.list()
-    indices = []
-    signs = 0
-    bit = 0
-    for i, c in enumerate(coeffs):
-        if c != 0:
-            indices.append(i)
-            if center_coefficient(c) == -1:
-                signs |= (1 << bit)
-            bit += 1
-    # 60 indices as unsigned shorts (2 bytes each)
-    data = struct.pack('<' + 'H' * 60, *indices)
-    # 8 bytes for signs
-    data += struct.pack('<Q', signs)
-    return data
-
 
 def benchmark_proof_size():
     """
@@ -74,7 +48,7 @@ def benchmark_proof_size():
     print("    (Paper reports ~78 KB total and ~20 KB per authority)")
 
 
-def benchmark_run_times(iterations=1000):
+def benchmark_run_times(iterations=10000):
     """
         Run benchmarking for the run times.
 
@@ -91,6 +65,7 @@ def benchmark_run_times(iterations=1000):
     # Warm-up
     for _ in range(3):
         simulate_or_proof(0)
+        simulate_or_proof(1)
 
     for _ in range(iterations):
         commit_start = time.perf_counter()
@@ -119,18 +94,49 @@ def benchmark_run_times(iterations=1000):
     avg_time_verifier = sum(times_verifier) / len(times_verifier)
 
     # Output results
-    print(f"    Average commitment time: {avg_time_commitment:.6f} s")
-    print(f"    Average proof generation time: {avg_time_prover:.6f} s")
-    print(f"    Average proof verification time: {avg_time_verifier:.6f} s")
+    print(f"    Average commitment time: {avg_time_commitment * 1000:.0f} ms")
+    print(f"    Average proof generation time: {avg_time_prover * 1000:.0f} ms")
+    print(f"    Average proof verification time: {avg_time_verifier * 1000:.0f} ms")
 
     # Compare to paper
     voter_time = avg_time_prover + N_A * avg_time_commitment
     print(f"\nVoter time ({N_A} commitments + OR‑proof):")
-    print(f"    Total time: {voter_time:.6f}s")
+    print(f"    Total time: {voter_time * 1000:.0f} ms")
     print("    (Paper reports ~8.5 ms)")
 
     current_time_end = datetime.now().strftime("%H:%M:%S")
     print("Benchmarking of run times finished at", current_time_end)
+
+
+# --------------------------------------------------------
+#  Helper Functions for Benchmarking
+# --------------------------------------------------------
+
+def serialize_challenge(f):
+    """
+        Serialize a challenge polynomial.
+
+        Args:
+            f: challenge polynomial
+
+        Returns:
+            serialized polynomial as 60 indices (2 bytes each) followed by a 8‑byte sign mask
+    """
+    coeffs = f.list()
+    indices = []
+    signs = 0
+    bit = 0
+    for i, c in enumerate(coeffs):
+        if c != 0:
+            indices.append(i)
+            if center_coefficient(c) == -1:
+                signs |= (1 << bit)
+            bit += 1
+    # 60 indices as unsigned shorts (2 bytes each)
+    data = struct.pack('<' + 'H' * 60, *indices)
+    # 8 bytes for signs
+    data += struct.pack('<Q', signs)
+    return data
 
 
 if __name__ == "__main__":

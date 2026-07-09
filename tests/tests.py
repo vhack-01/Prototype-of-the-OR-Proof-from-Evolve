@@ -40,11 +40,13 @@ def test_valid_proofs():
         print(f"  m = {m}: OK")
 
 
-def test_random_valid_proofs(iterations=1000):
+def test_random_valid_proofs(iterations=10000):
     """
         Test OR‑proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
     """
-    print("Testing valid OR‑proofs...")
+
+    current_time_start = datetime.now().strftime("%H:%M:%S")
+    print(f"Testing random valid OR-proofs started at {current_time_start} | Running {iterations} iterations")
 
     for i in range(iterations):
         m = random.randint(0, 1)
@@ -53,6 +55,9 @@ def test_random_valid_proofs(iterations=1000):
         r0, r1, f0, f1, _ = generate_or_proof(m, C, c, r)
 
         assert verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be valid"
+
+    current_time_end = datetime.now().strftime("%H:%M:%S")
+    print("Testing random valid OR-proofs finished at", current_time_end)
 
 
 def test_tampered_proof():
@@ -181,7 +186,7 @@ def test_commitment_homomorphism():
     assert m3 == m1 + m2, "Commitment scheme should be homomorphic"
 
 
-def test_rejection_sampling(iterations=1000):
+def test_rejection_sampling(iterations=10000):
     """
         According to the paper, it should take on average 3 tries to generate an OR-proof. Generate 'iteration' OR-proofs and
         calculate the mean.
@@ -189,9 +194,8 @@ def test_rejection_sampling(iterations=1000):
         Args:
             iterations: number of OR-proofs to simulate
     """
-    print(f"Simulating {iterations} OR-proofs to test rejection sampling...")
     current_time_start = datetime.now().strftime("%H:%M:%S")
-    print(f"Benchmarking of run times started at {current_time_start} | Running {iterations} iterations")
+    print(f"Testing Rejection Sampling started at {current_time_start} | Running {iterations} iterations")
 
     attempts_counter = 0
 
@@ -209,23 +213,19 @@ def test_rejection_sampling(iterations=1000):
         _, _, _, _, attempts = generate_or_proof(m, C, c, r)
         attempts_counter += attempts
 
-    # Calculate average attempts
     avg_attempts = attempts_counter / iterations
 
     assert 2.5 < avg_attempts < 3.5, f"Average attempts should be ~3, got {avg_attempts:.2f}"
 
     # Output results
     print(f"    Average attempts needed to generate a proof: {avg_attempts:.2f}")
+
     current_time_end = datetime.now().strftime("%H:%M:%S")
-    print("Benchmarking of run times finished at", current_time_end)
+    print("Testing Rejection Sampling finished at", current_time_end)
 
 
 if __name__ == "__main__":
     # Commitment Scheme
-    test_mismatch_invalid_commitment_valid_proof()
-    test_mismatch_valid_commitment_invalid_proof()
-    test_mismatch_valid_commitment_valid_proof()
-    test_tampered_commitment()
     test_commitment_scheme()
     test_commitment_homomorphism()
 
@@ -235,6 +235,12 @@ if __name__ == "__main__":
     test_invalid_proof(-1)
     test_invalid_proof(3)
     test_invalid_proof(346334343)
+
+    # Mixed
+    test_tampered_commitment()
+    test_mismatch_invalid_commitment_valid_proof()
+    test_mismatch_valid_commitment_invalid_proof()
+    test_mismatch_valid_commitment_valid_proof()
 
     # These tests may run a long time depending on the chosen amount of iterations
     test_random_valid_proofs()
