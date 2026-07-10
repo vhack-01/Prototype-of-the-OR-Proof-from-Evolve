@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from simulate_or_proof import simulate_or_proof
 
 # --------------------------------------------------------
@@ -8,10 +6,8 @@ from simulate_or_proof import simulate_or_proof
 
 
 if __name__ == "__main__":
-    current_time = datetime.now().strftime("%H:%M:%S")
-    print("Current Time Start =", current_time)
 
-    for m in range(-5, 5):
+    for m in range(-10, 10):
         print("----------------------")
         print(f"Simulating OR-proof for m = {m}")
 
@@ -21,6 +17,3 @@ if __name__ == "__main__":
             print("✅ OR-proof valid")
         else:
             print("❌ OR-proof not valid")
-
-    current_time2 = datetime.now().strftime("%H:%M:%S")
-    print("Current Time End =", current_time2)
