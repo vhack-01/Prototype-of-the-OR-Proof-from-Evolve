@@ -16,9 +16,10 @@ def simulate_or_proof(m):
         Returns:
             True if the OR-proof was valid, False otherwise.
     """
-    C, c, r = commitment.generate_commitment(m)
+    C = commitment.generate_commitment_key()
+    c, r = commitment.commit(C,m)
 
-    r0, r1, f0, f1 = prover.generate_or_proof(m, C, c, r)
+    r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, c, r)
 
     is_valid = verifier.verify_or_proof(C, c, r0, r1, f0, f1)
 

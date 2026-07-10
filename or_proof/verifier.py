@@ -1,10 +1,9 @@
-from math import sqrt
-
 import sage.all as sg
 
-from config.params import D, N, Q, B_OR_PRIME
+from config.params import D, Q, B_OR_PRIME
 from config.ring import Rq
-from utils.shared_utils import hash_to_challenge, apply_permutation, center_coefficient
+from utils.shared_utils import apply_permutation, norm_rq_vector
+from utils.fiat_shamir import hash_to_challenge
 
 
 # --------------------------------------------------------
@@ -35,8 +34,8 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
     perm, signs = hash_to_challenge(c, t0, t1)
 
     # (4) + (5) Check norm bounds
-    r0_norm = sqrt(sum(center_coefficient(c) ** 2 for poly in r0 for c in poly.list()))
-    r1_norm = sqrt(sum(center_coefficient(c) ** 2 for poly in r1 for c in poly.list()))
+    r0_norm = norm_rq_vector(r0)
+    r1_norm = norm_rq_vector(r1)
 
     if r0_norm > B_OR_PRIME or r1_norm > B_OR_PRIME:
         return False

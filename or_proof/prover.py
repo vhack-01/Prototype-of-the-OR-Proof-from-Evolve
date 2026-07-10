@@ -3,9 +3,11 @@ from math import exp
 
 import sage.all as sg
 
-from config.params import N, D, Q, SIGMA_OR
+from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import hash_to_challenge, apply_permutation, sample_randomness, center_coefficient
+from utils.shared_utils import apply_permutation, center_coefficient
+from utils.gaussian_sampler import sample_randomness_for_or_proof
+from utils.fiat_shamir import hash_to_challenge
 
 
 # --------------------------------------------------------
@@ -23,11 +25,16 @@ def generate_or_proof(m, C, c, r):
             r: randomness vector used to create c
 
         Returns:
-            two response vectors (r0, r1) and two challenge polynomials (f0, f1)
+            two response vectors (r0, r1)
+            two challenge polynomials (f0, f1)
+            amounts of attempts needed to create the proof
     """
+    attempts = 0
     while True:
+        attempts += 1
+
         # (1) Sample fake randomness
-        r_fake = sample_randomness(SIGMA_OR)  # r_{1-m}
+        r_fake = sample_randomness_for_or_proof()  # r_{1-m}
 
         # (2) Generate fake challenge polynomial
         f_fake = generate_challenge_polynomial()  # f_{1-m}
@@ -36,7 +43,7 @@ def generate_or_proof(m, C, c, r):
         t_fake = compute_fake_commitment(m, C, c, r_fake, f_fake)  # t_{1-m}
 
         # (4) Sample honest randomness
-        rho = sample_randomness(SIGMA_OR)
+        rho = sample_randomness_for_or_proof()
 
         # (5) Compute honest commitment
         t_honest = C * rho  # t_{m}
@@ -61,7 +68,7 @@ def generate_or_proof(m, C, c, r):
         if rejection_sample_keep(r_honest, f_honest, r):
             break
 
-        print("Aborted (Rejection sampling)")
+        # print("Aborted (Rejection sampling)")
 
     # (10) Output the proof
     if m == 0:
@@ -71,7 +78,7 @@ def generate_or_proof(m, C, c, r):
         r0, r1 = r_fake, r_honest
         f0, f1 = f_fake, f_honest
 
-    return r0, r1, f0, f1
+    return r0, r1, f0, f1, attempts
 
 
 # --------------------------------------------------------
