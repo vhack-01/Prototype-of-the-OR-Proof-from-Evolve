@@ -71,6 +71,19 @@ def apply_permutation(poly, perm, signs, inverse=False):
     return Rq(new_coeffs)
 
 
+def norm_rq_vector(vec):
+    """
+        Compute the Euclidean norm of a vector of polynomials in Rq
+
+        Args:
+            vec: vector over Rq
+
+        Returns:
+            Euclidean norm of vec
+    """
+    return sqrt(sum(center_coefficient(c) ** 2 for poly in vec for c in poly.list()))
+
+
 def serialize_rq_vector(vec):
     """
         Serialize a vector of polynomials in Rq to bytes (little-endian signed 32-bit ints)
@@ -85,16 +98,3 @@ def serialize_rq_vector(vec):
     for poly in vec:
         data += struct.pack('<' + 'i' * N, *[int(center_coefficient(c)) for c in poly.list()])
     return data
-
-
-def norm_rq_vector(vec):
-    """
-        Compute the Euclidean norm of a vector of polynomials in Rq
-
-        Args:
-            vec: vector over Rq
-
-        Returns:
-            Euclidean norm of vec
-    """
-    return sqrt(sum(center_coefficient(c) ** 2 for poly in vec for c in poly.list()))

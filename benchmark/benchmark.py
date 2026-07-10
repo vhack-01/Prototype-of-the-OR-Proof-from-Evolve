@@ -26,7 +26,7 @@ def benchmark_proof_size():
     c, r = commit(C, 0)
     r0, r1, f0, f1, _ = generate_or_proof(0, C, c, r)
 
-    # ---------- Sizes of individual components ----------
+    # Sizes of individual components
     commitment_size = len(serialize_rq_vector(c))
     print(f"    Commitment size (per authority): {commitment_size / 1024:.1f} KB")
 
@@ -38,7 +38,7 @@ def benchmark_proof_size():
     proof_size = len(proof_bytes)
     print(f"    OR‑proof size: {proof_size / 1024:.1f} KB")
 
-    # ---------- Voter totals ----------
+    # Voter totals
     total = N_A * commitment_size + proof_size
     avg_per_authority_no_cipher = total / N_A
 
@@ -126,16 +126,17 @@ def serialize_challenge(f):
     indices = []
     signs = 0
     bit = 0
+
     for i, c in enumerate(coeffs):
         if c != 0:
             indices.append(i)
             if center_coefficient(c) == -1:
                 signs |= (1 << bit)
             bit += 1
-    # 60 indices as unsigned shorts (2 bytes each)
-    data = struct.pack('<' + 'H' * 60, *indices)
-    # 8 bytes for signs
-    data += struct.pack('<Q', signs)
+
+    data = struct.pack('<' + 'H' * 60, *indices)  # 60 indices as unsigned shorts (2 bytes each)
+    data += struct.pack('<Q', signs)  # 8 bytes for signs
+
     return data
 
 

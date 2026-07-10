@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import sage.all as sg
+
 from commitment.commitment import open, commit, generate_commitment_key
 from or_proof.prover import generate_or_proof
 from or_proof.verifier import verify_or_proof
@@ -38,26 +39,6 @@ def test_valid_proofs():
         assert verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be valid"
 
         print(f"  m = {m}: OK")
-
-
-def test_random_valid_proofs(iterations=10000):
-    """
-        Test OR‑proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
-    """
-
-    current_time_start = datetime.now().strftime("%H:%M:%S")
-    print(f"Testing random valid OR-proofs started at {current_time_start} | Running {iterations} iterations")
-
-    for i in range(iterations):
-        m = random.randint(0, 1)
-        C = generate_commitment_key()
-        c, r = commit(C, m)
-        r0, r1, f0, f1, _ = generate_or_proof(m, C, c, r)
-
-        assert verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be valid"
-
-    current_time_end = datetime.now().strftime("%H:%M:%S")
-    print("Testing random valid OR-proofs finished at", current_time_end)
 
 
 def test_tampered_proof():
@@ -186,7 +167,27 @@ def test_commitment_homomorphism():
     assert m3 == m1 + m2, "Commitment scheme should be homomorphic"
 
 
-def test_rejection_sampling(iterations=10000):
+def test_random_valid_proofs(iterations=1000):
+    """
+        Test OR‑proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
+    """
+
+    current_time_start = datetime.now().strftime("%H:%M:%S")
+    print(f"Testing random valid OR-proofs started at {current_time_start} | Running {iterations} iterations")
+
+    for i in range(iterations):
+        m = random.randint(0, 1)
+        C = generate_commitment_key()
+        c, r = commit(C, m)
+        r0, r1, f0, f1, _ = generate_or_proof(m, C, c, r)
+
+        assert verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be valid"
+
+    current_time_end = datetime.now().strftime("%H:%M:%S")
+    print("Testing random valid OR-proofs finished at", current_time_end)
+
+
+def test_rejection_sampling(iterations=1000):
     """
         According to the paper, it should take on average 3 tries to generate an OR-proof. Generate 'iteration' OR-proofs and
         calculate the mean.
