@@ -5,8 +5,9 @@ import sage.all as sg
 
 from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import hash_to_challenge, apply_permutation, sample_randomness, center_coefficient, \
-    proof_sampler
+from utils.shared_utils import apply_permutation, center_coefficient
+from utils.gaussian_sampler import sample_randomness_for_or_proof
+from utils.fiat_shamir import hash_to_challenge
 
 
 # --------------------------------------------------------
@@ -33,7 +34,7 @@ def generate_or_proof(m, C, c, r):
         attempts += 1
 
         # (1) Sample fake randomness
-        r_fake = sample_randomness(proof_sampler)  # r_{1-m}
+        r_fake = sample_randomness_for_or_proof()  # r_{1-m}
 
         # (2) Generate fake challenge polynomial
         f_fake = generate_challenge_polynomial()  # f_{1-m}
@@ -42,7 +43,7 @@ def generate_or_proof(m, C, c, r):
         t_fake = compute_fake_commitment(m, C, c, r_fake, f_fake)  # t_{1-m}
 
         # (4) Sample honest randomness
-        rho = sample_randomness(proof_sampler)
+        rho = sample_randomness_for_or_proof()
 
         # (5) Compute honest commitment
         t_honest = C * rho  # t_{m}

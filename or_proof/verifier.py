@@ -2,7 +2,8 @@ import sage.all as sg
 
 from config.params import D, Q, B_OR_PRIME
 from config.ring import Rq
-from utils.shared_utils import hash_to_challenge, apply_permutation, norm_rq_vector
+from utils.shared_utils import apply_permutation, norm_rq_vector
+from utils.fiat_shamir import hash_to_challenge
 
 
 # --------------------------------------------------------
