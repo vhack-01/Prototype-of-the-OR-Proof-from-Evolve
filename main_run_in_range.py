@@ -1,7 +1,7 @@
 from simulate_or_proof import simulate_or_proof
 
 # --------------------------------------------------------
-#  Simulate an OR-proof for all values for m in the range defined in line 14
+#  Simulate an OR-proof for all values for m in the range defined in line 10
 # --------------------------------------------------------
 
 

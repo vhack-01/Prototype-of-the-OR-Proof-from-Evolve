@@ -20,7 +20,7 @@ def compute_parameters():
         Returns:
             sigma_OR, B_OR_prime, B_r
     """
-    # all the bounds are given as >=, so we can use ceil() to mitigate potential floating-point errors
+    # all the bounds are given as >=, so we can use ceil() to guarantee that they are satisfied
     B_OR = ceil(2 * N_A * sqrt(N * (2 * D + 1)) * SIGMA_COMMITMENT)     # chapter 5, B_{OR} >= ...
     sigma_OR = ceil(22 * sqrt(60) * B_OR)                               # Theorem 3.2., σ_{OR} >= ...
     B_OR_prime = ceil(2 * sqrt(N * (2 * D + 1)) * sigma_OR)             # Theorem 3.2. (or chapter 5), B'_{OR} >= ...
@@ -29,5 +29,5 @@ def compute_parameters():
     return sigma_OR, B_OR_prime, B_r
 
 
-# Proof standard deviation, Bound for randomness of OR-proof, Bound for+ randomness of a commitment
+# Proof standard deviation, Bound for randomness of OR-proof, Bound for randomness of a commitment
 SIGMA_OR, B_OR_PRIME, B_R = compute_parameters()

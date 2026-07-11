@@ -17,7 +17,8 @@ from config.params import N_A
 
 def benchmark_proof_size():
     """
-    Measure the size of a voter's complete contribution to the bulletin board and compare with the paper's numbers.
+    Measure the size of a voter's contribution to the bulletin board (one OR-proof, one commitment/authority)
+    and compare with the paper's numbers.
     """
     print("Benchmarking voter-side sizes")
 

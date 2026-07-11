@@ -6,7 +6,7 @@ import sage.all as sg
 from config.params import N, D, SIGMA_OR
 from config.ring import Rq
 from utils.shared_utils import apply_permutation, center_coefficient
-from utils.gaussian_sampler import sample_randomness_for_or_proof
+from utils.gaussian_sampler import sample_randomness_or_proof
 from utils.fiat_shamir import hash_to_challenge
 
 
@@ -25,16 +25,17 @@ def generate_or_proof(m, C, c, r):
             r: randomness vector used to create c
 
         Returns:
-            two response vectors (r0, r1)
+            two opening vectors (r0, r1)
             two challenge polynomials (f0, f1)
             amounts of attempts needed to create the proof
     """
     attempts = 0
+
     while True:
         attempts += 1
 
         # (1) Sample fake randomness
-        r_fake = sample_randomness_for_or_proof()  # r_{1-m}
+        r_fake = sample_randomness_or_proof()  # r_{1-m}
 
         # (2) Generate fake challenge polynomial
         f_fake = generate_challenge_polynomial()  # f_{1-m}
@@ -43,7 +44,7 @@ def generate_or_proof(m, C, c, r):
         t_fake = compute_fake_commitment(m, C, c, r_fake, f_fake)  # t_{1-m}
 
         # (4) Sample honest randomness
-        rho = sample_randomness_for_or_proof()
+        rho = sample_randomness_or_proof()
 
         # (5) Compute honest commitment
         t_honest = C * rho  # t_{m}
@@ -61,14 +62,12 @@ def generate_or_proof(m, C, c, r):
         # (7) Compute honest challenge polynomial (f_{m})
         f_honest = apply_permutation(f_fake, perm, signs, ((2 * m - 1) == -1))
 
-        # (8) Compute honest response
+        # (8) Compute honest opening
         r_honest = rho + f_honest * r  # r_{m}
 
         # (9) Perform rejection sampling
         if rejection_sample_keep(r_honest, f_honest, r):
             break
-
-        # print("Aborted (Rejection sampling)")
 
     # (10) Output the proof
     if m == 0:
@@ -119,6 +118,7 @@ def generate_challenge_polynomial():
     coeffs = [0] * N
     for idx in indices:
         coeffs[idx] = random.choice([1, -1])
+
     return Rq(coeffs)
 
 
@@ -128,7 +128,7 @@ def rejection_sample_keep(r_m, f_m, r):
     Returns True if the sample should be kept, False if it should be aborted.
 
     Args:
-        r_m: the computed response vector
+        r_m: the computed opening vector
         f_m: the real challenge polynomial
         r: the real randomness used in the commitment
 

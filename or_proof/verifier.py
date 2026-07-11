@@ -17,16 +17,16 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
     Args:
         C: public commitment key
         c: commitment vector
-        r0, r1: response vectors
+        r0, r1: opening vectors
         f0, f1: challenge polynomials
 
     Returns:
         True if the proof is valid, False otherwise.
     """
-    # (1) Compute t0
+    # (1) Compute t_0
     t0 = C * r0 - f0 * c
 
-    # (2) Compute t1
+    # (2) Compute t_1
     vec = sg.vector(Rq, [0] * D + [1])
     t1 = C * r1 + f1 * vec - f1 * c
 
@@ -40,11 +40,11 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
     if r0_norm > B_OR_PRIME or r1_norm > B_OR_PRIME:
         return False
 
-    # (6) Check if f0 belongs to the challenge set
+    # (6) Check if f_0 belongs to the challenge set
     if not is_valid_challenge_polynomial(f0):
         return False
 
-    # (7) Check f1 = π(f0)
+    # (7) Check f_1 = π(f_0)
     f1_computed = apply_permutation(f0, perm, signs, False)
     if f1 != f1_computed:
         return False

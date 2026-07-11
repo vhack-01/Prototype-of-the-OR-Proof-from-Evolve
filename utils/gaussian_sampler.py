@@ -14,7 +14,7 @@ dim = N * (2 * D + 1)
 #  Discrete Gaussian Sampling
 # --------------------------------------------------------
 
-def sample_randomness_for_commitment():
+def sample_randomness_commitment():
     """
         Sample a randomness vector for the OR proof. The coefficients of each polynomial
         are drawn from a discrete Gaussian distribution with standard deviation SIGMA_COMMITMENT. It uses
@@ -27,7 +27,7 @@ def sample_randomness_for_commitment():
     return sample_randomness(commitment_sampler)
 
 
-def sample_randomness_for_or_proof():
+def sample_randomness_or_proof():
     """
         Sample a randomness vector for the OR proof. The coefficients of each polynomial
         are drawn from a discrete Gaussian distribution with standard deviation SIGMA_OR. It uses

@@ -1,4 +1,4 @@
-# Prototypical implementation of the OR-proof from 'EVOLVE'
+# Prototypical Implementation of the OR-proof from 'EVOLVE'
 
 This repository contains a prototypical implementation of the **OR-proof** described in the paper  
 "Practical Quantum-Safe Voting from Lattices" (see [References](#references)). The OR-proof allows a prover to
@@ -23,7 +23,7 @@ All commands described below must be executed inside a SageMath environment.
   ```bash
   python <file_name>.py
   ```
-- ``main_run_in_range.py`` simulates an OR-proof for every m in the hardcoded range (adjustable by editing line 14)
+- ``main_run_in_range.py`` simulates an OR-proof for every m in the hardcoded range (adjustable by editing line 10)
 - ``main_run_with_random_input.py`` simulates an OR-proof for 0 or 1 (chosen randomly)
 - ``main_run_with_user_input.py`` simulates an OR-proof for the value entered by the user
 
