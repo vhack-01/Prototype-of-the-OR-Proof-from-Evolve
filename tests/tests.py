@@ -25,9 +25,9 @@ set_random_seed(SEED)
 
 def test_valid_proofs():
     """
-        Test OR‑proof generation and verification for m = 0 and m = 1.
+        Test OR-proof generation and verification for m = 0 and m = 1.
     """
-    print("Testing valid OR‑proofs...")
+    print("Testing valid OR-proofs...")
 
     for m in (0, 1):
         # Generate proof
@@ -169,7 +169,7 @@ def test_commitment_homomorphism():
 
 def test_random_valid_proofs(iterations=1000):
     """
-        Test OR‑proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
+        Test OR-proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
     """
 
     current_time_start = datetime.now().strftime("%H:%M:%S")
@@ -189,8 +189,8 @@ def test_random_valid_proofs(iterations=1000):
 
 def test_rejection_sampling(iterations=1000):
     """
-        According to the paper, it should take on average 3 tries to generate an OR-proof. Generate 'iteration' OR-proofs and
-        calculate the mean.
+        According to the paper, it should take on average 3 tries to generate an OR-proof.
+        To test this, generate 'iterations' OR-proofs and calculate the mean.
 
         Args:
             iterations: number of OR-proofs to simulate

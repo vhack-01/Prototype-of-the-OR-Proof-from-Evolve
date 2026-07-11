@@ -37,13 +37,13 @@ def benchmark_proof_size():
                    serialize_challenge(f0) +
                    serialize_challenge(f1))
     proof_size = len(proof_bytes)
-    print(f"    OR‑proof size: {proof_size / 1024:.1f} KB")
+    print(f"    OR-proof size: {proof_size / 1024:.1f} KB")
 
     # Voter totals
     total = N_A * commitment_size + proof_size
     avg_per_authority_no_cipher = total / N_A
 
-    print(f"\nVoter contribution ({N_A} commitments + OR‑proof):")
+    print(f"\nVoter contribution ({N_A} commitments + OR-proof):")
     print(f"    Total size: {total / 1024:.1f} KB")
     print(f"    Average per authority: {avg_per_authority_no_cipher / 1024:.1f} KB")
     print("    (Paper reports ~78 KB total and ~20 KB per authority)")
@@ -101,7 +101,7 @@ def benchmark_run_times(iterations=10000):
 
     # Compare to paper
     voter_time = avg_time_prover + N_A * avg_time_commitment
-    print(f"\nVoter time ({N_A} commitments + OR‑proof):")
+    print(f"\nVoter time ({N_A} commitments + OR-proof):")
     print(f"    Total time: {voter_time * 1000:.0f} ms")
     print("    (Paper reports ~8.5 ms)")
 
@@ -121,7 +121,7 @@ def serialize_challenge(f):
             f: challenge polynomial
 
         Returns:
-            serialized polynomial as 60 indices (2 bytes each) followed by a 8‑byte sign mask
+            serialized polynomial as 60 indices (2 bytes each) followed by a 8-byte sign mask
     """
     coeffs = f.list()
     indices = []
