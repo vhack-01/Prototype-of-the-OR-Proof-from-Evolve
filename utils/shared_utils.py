@@ -1,8 +1,7 @@
 import struct
-import hashlib
 from math import sqrt
 
-from config.params import D, N, Q
+from config.params import N, Q
 from config.ring import Rq
 
 
