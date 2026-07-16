@@ -2,7 +2,7 @@ import sage.all as sg
 
 from config.ring import Rq
 from config.params import D, B_R
-from utils.shared_utils import norm_rq_vector, center_coefficient
+from utils.shared_utils import norm_rq_vector
 from utils.gaussian_sampler import sample_randomness_commitment
 
 
@@ -71,5 +71,5 @@ def open(C, c, r):  # Open
         return None
 
     # (2) Extract the message from the last row and return it
-    m_actual = center_coefficient(diff[D][0])
+    m_actual = diff[D][0].lift_centered()
     return m_actual

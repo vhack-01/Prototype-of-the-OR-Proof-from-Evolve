@@ -6,7 +6,7 @@ from commitment.commitment import generate_commitment_key, commit
 from or_proof.prover import generate_or_proof
 from or_proof.verifier import verify_or_proof
 from simulate_or_proof import simulate_or_proof
-from utils.shared_utils import serialize_rq_vector, center_coefficient
+from utils.shared_utils import serialize_rq_vector
 from config.params import N_A
 
 
@@ -131,7 +131,7 @@ def serialize_challenge(f):
     for i, c in enumerate(coeffs):
         if c != 0:
             indices.append(i)
-            if center_coefficient(c) == -1:
+            if c.lift_centered() == -1:
                 signs |= (1 << bit)
             bit += 1
 

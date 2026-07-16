@@ -5,7 +5,7 @@ import sage.all as sg
 
 from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import apply_permutation, center_coefficient
+from utils.shared_utils import apply_permutation
 from utils.gaussian_sampler import sample_randomness_or_proof
 from utils.fiat_shamir import hash_to_challenge
 
@@ -139,8 +139,8 @@ def rejection_sample_keep(r_m, f_m, r):
     v = f_m * r
 
     # Convert to integer coefficient vectors (centered, see EVOLVE paper section 2.1)
-    r_m_ints = [center_coefficient(c) for poly in r_m for c in poly.list()]
-    v_ints = [center_coefficient(c) for poly in v for c in poly.list()]
+    r_m_ints = [c.lift_centered() for poly in r_m for c in poly.list()]
+    v_ints = [c.lift_centered() for poly in v for c in poly.list()]
 
     # Compute squared Euclidean norm and dot product
     v_norm2 = sum(i ** 2 for i in v_ints)

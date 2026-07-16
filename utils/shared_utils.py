@@ -9,21 +9,6 @@ from config.ring import Rq
 #  Helper functions for the Commitment, Prover and Verifier
 # --------------------------------------------------------
 
-def center_coefficient(c):
-    """
-        Convert a ring element coefficient to its centered representative modulo Q (EVOLVE paper section 2.1 states that
-        integers modulo q will be represented between -⌊(Q-1)/2⌋ and +⌊(Q+1)/2⌋).
-
-        Args:
-            c: a ring element
-
-        Returns:
-            the centered integer representative of c
-    """
-    half_q = (Q + 1) // 2  # = +⌊(Q+1)/2⌋)
-    c_int = c.lift()  # returns the integer representation of c between 0 and Q-1
-    return c_int if c_int <= half_q else c_int - Q  # center c if needed
-
 
 def apply_permutation(poly, perm, signs, inverse=False):
     """
@@ -80,7 +65,7 @@ def norm_rq_vector(vec):
         Returns:
             Euclidean norm of vec
     """
-    return sqrt(sum(center_coefficient(c) ** 2 for poly in vec for c in poly.list()))
+    return sqrt(sum(c.lift_centered() ** 2 for poly in vec for c in poly.list()))
 
 
 def serialize_rq_vector(vec):
@@ -95,5 +80,5 @@ def serialize_rq_vector(vec):
     """
     data = b''
     for poly in vec:
-        data += struct.pack('<' + 'i' * N, *[int(center_coefficient(c)) for c in poly.list()])
+        data += struct.pack('<' + 'i' * N, *[int(c.lift_centered()) for c in poly.list()])
     return data
