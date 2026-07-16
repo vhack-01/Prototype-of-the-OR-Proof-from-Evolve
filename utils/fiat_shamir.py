@@ -11,7 +11,7 @@ from config.params import N
 
 def hash_to_challenge(c, t0, t1):
     """
-        Fiat-Shamir hash function using SHAKE256 as a proper Extendable-Output Function (XOF)
+        Fiat-Shamir hash function using SHAKE256 as a proper eXtendable-Output Function (XOF)
         that maps the given args to a permutation π = (perm, signs).
         This implements the challenge space Π = Perm(n) × {0,1}^60.
 

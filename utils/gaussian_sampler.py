@@ -4,15 +4,17 @@ import sage.all as sg
 from config.params import N, D, SIGMA_OR, SIGMA_COMMITMENT
 from config.ring import Rq
 
-commitment_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_COMMITMENT)
-proof_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_OR)
-
-dim = N * (2 * D + 1)
-
-
 # --------------------------------------------------------
 #  Discrete Gaussian Sampling
 # --------------------------------------------------------
+
+# create one sampler for each standard deviation
+commitment_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_COMMITMENT)
+proof_sampler = DiscreteGaussianDistributionIntegerSampler(SIGMA_OR)
+
+# length of each randomness vector
+DIM = N * (2 * D + 1)
+
 
 def sample_randomness_commitment():
     """
@@ -42,7 +44,8 @@ def sample_randomness_or_proof():
 
 def sample_randomness(sampler):
     """
-        Sample a vector of length N(2D+1) whose components are polynomials in Rq using the provided sampler.
+        Sample a randomness vector of length DIM using the provided sampler, then reshape it into a vector of
+        polynomials over Rq. The sampler must be an instance of DiscreteGaussianDistributionIntegerSampler.
 
         Args:
             sampler: the sampler to use
@@ -50,7 +53,7 @@ def sample_randomness(sampler):
         Returns:
             vector over Rq
     """
-    coeffs_list = sg.vector(sg.ZZ, [sampler() for _ in range(dim)]).list()
+    coeffs_list = sg.vector(sg.ZZ, [sampler() for _ in range(DIM)]).list()
 
     chunks = [coeffs_list[i:i + N] for i in range(0, len(coeffs_list), N)]
     r_polys = [Rq(chunk) for chunk in chunks]
