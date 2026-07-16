@@ -5,7 +5,7 @@ import sage.all as sg
 
 from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import apply_permutation
+from utils.shared_utils import apply_challenge
 from utils.gaussian_sampler import sample_randomness_or_proof
 from utils.fiat_shamir import hash_to_challenge
 
@@ -60,7 +60,7 @@ def generate_or_proof(m, C, c, r):
         perm, signs = hash_to_challenge(c, t0, t1)
 
         # (7) Compute honest challenge polynomial (f_{m})
-        f_honest = apply_permutation(f_fake, perm, signs, ((2 * m - 1) == -1))
+        f_honest = apply_challenge(f_fake, perm, signs, ((2 * m - 1) == -1))
 
         # (8) Compute honest opening
         r_honest = rho + f_honest * r  # r_{m}

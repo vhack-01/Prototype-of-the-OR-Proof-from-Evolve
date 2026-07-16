@@ -10,10 +10,10 @@ from config.ring import Rq
 # --------------------------------------------------------
 
 
-def apply_permutation(poly, perm, signs, inverse=False):
+def apply_challenge(poly, perm, signs, inverse=False):
     """
-    Apply a permutation (and sign flips) to the coefficients of a polynomial,
-    or apply its inverse if inverse=True.
+    Apply a permutation and sign flips to the coefficients of a polynomial,
+    or apply the inverse if inverse=True.
 
     Args:
         poly: a challenge polynomial from the challenge space

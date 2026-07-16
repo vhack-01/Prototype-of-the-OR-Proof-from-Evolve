@@ -2,7 +2,7 @@ import sage.all as sg
 
 from config.params import D, Q, B_OR_PRIME
 from config.ring import Rq
-from utils.shared_utils import apply_permutation, norm_rq_vector
+from utils.shared_utils import apply_challenge, norm_rq_vector
 from utils.fiat_shamir import hash_to_challenge
 
 
@@ -45,7 +45,7 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
         return False
 
     # (7) Check f_1 = π(f_0)
-    f1_computed = apply_permutation(f0, perm, signs, False)
+    f1_computed = apply_challenge(f0, perm, signs, False)
     if f1 != f1_computed:
         return False
 
