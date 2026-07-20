@@ -1,5 +1,6 @@
 import random
 from math import exp
+import secrets
 
 import sage.all as sg
 
@@ -8,10 +9,12 @@ from config.ring import Rq
 from utils.gaussian_sampler import sample_randomness_or_proof
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
 
-
 # --------------------------------------------------------
 #  OR-Proof - Prover (EVOLVE paper section 3.2, Π_{OR} algorithm)
 # --------------------------------------------------------
+
+SECURE_RNG = secrets.SystemRandom()  # instantiate a cryptographically secure random number generator
+
 
 def generate_or_proof(m, C, c, r):
     """
@@ -83,6 +86,22 @@ def generate_or_proof(m, C, c, r):
 #  Helper Functions for the Prover
 # --------------------------------------------------------
 
+def generate_challenge_polynomial():
+    """
+        Pick a random challenge polynomial from the challenge space.
+        The polynomial must have exactly 60 non-zero coefficients, each being in {-1, 1} (see EVOLVE paper section 3.2).
+
+        Returns:
+            the challenge polynomial
+    """
+    indices = SECURE_RNG.sample(range(N), 60)  # choose 60 random indices that will have non-zero coefficients
+    coeffs = [0] * N
+    for idx in indices:
+        coeffs[idx] = SECURE_RNG.choice([1, -1])
+
+    return Rq(coeffs)
+
+
 def compute_fake_commitment(m, C, c, r_fake, f_fake):
     """
         Generate a fake commitment for the OR-proof.
@@ -103,22 +122,6 @@ def compute_fake_commitment(m, C, c, r_fake, f_fake):
     f_c = f_fake * c
 
     return C_r + f_v - f_c
-
-
-def generate_challenge_polynomial():
-    """
-        Pick a random challenge polynomial from the challenge space.
-        The polynomial must have exactly 60 non-zero coefficients, each being in {-1, 1} (see EVOLVE paper section 3.2).
-
-        Returns:
-            the challenge polynomial
-    """
-    indices = random.sample(range(N), 60)  # choose 60 random indices that will have non-zero coefficients
-    coeffs = [0] * N
-    for idx in indices:
-        coeffs[idx] = random.choice([1, -1])
-
-    return Rq(coeffs)
 
 
 def rejection_sample_keep(r_m, f_m, r):
