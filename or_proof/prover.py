@@ -43,7 +43,7 @@ def generate_or_proof(m, C, c, r):
         f_fake = generate_challenge_polynomial()  # f_{1-m}
 
         # (3) Compute fake commitment
-        t_fake = compute_fake_commitment(m, C, c, r_fake, f_fake)  # t_{1-m}
+        t_fake = C * r_fake + f_fake * sg.vector(Rq, [0] * D + [1 - m]) - f_fake * c  # t_{1-m}
 
         # (4) Sample honest randomness
         rho = sample_randomness_or_proof()
@@ -102,28 +102,6 @@ def generate_challenge_polynomial():
     return Rq(coeffs)
 
 
-def compute_fake_commitment(m, C, c, r_fake, f_fake):
-    """
-        Generate a fake commitment for the OR-proof.
-
-        Args:
-            m: message
-            C: public commitment key
-            c: commitment vector
-            r_fake: fake randomness
-            f_fake: fake challenge
-
-        Returns:
-            the fake commitment
-    """
-    C_r = C * r_fake
-    v = sg.vector(Rq, [0] * D + [1 - m])
-    f_v = f_fake * v
-    f_c = f_fake * c
-
-    return C_r + f_v - f_c
-
-
 def rejection_sample_keep(r_m, f_m, r):
     """
     Implements the rejection sampling step, following the Theorem 2.5 in the EVOLVE paper.
@@ -152,4 +130,4 @@ def rejection_sample_keep(r_m, f_m, r):
     exponent = (v_norm2 - 2 * dot) / (2.0 * (SIGMA_OR ** 2))
 
     # Π_{OR} algorithm says to "Abort with probability 1 - min(..)", i.e. keep with probability min(..)
-    return random.random() < min(exp(exponent) / 3.0, 1)
+    return SECURE_RNG.random() < min(exp(exponent) / 3.0, 1)
