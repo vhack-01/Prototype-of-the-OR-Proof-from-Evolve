@@ -5,9 +5,8 @@ import sage.all as sg
 
 from config.params import N, D, SIGMA_OR
 from config.ring import Rq
-from utils.shared_utils import apply_challenge
 from utils.gaussian_sampler import sample_randomness_or_proof
-from utils.fiat_shamir import hash_to_challenge
+from utils.fiat_shamir import hash_to_challenge, apply_challenge
 
 
 # --------------------------------------------------------
@@ -49,7 +48,7 @@ def generate_or_proof(m, C, c, r):
         # (5) Compute honest commitment
         t_honest = C * rho  # t_{m}
 
-        # (6) Obtain challenge permutation
+        # (6) Obtain Fiat-Shamir challenge
         if m == 0:
             t0 = t_honest
             t1 = t_fake

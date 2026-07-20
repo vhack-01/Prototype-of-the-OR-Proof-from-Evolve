@@ -1,62 +1,12 @@
 import struct
 from math import sqrt
 
-from config.params import N, Q
-from config.ring import Rq
+from config.params import N
 
 
 # --------------------------------------------------------
 #  Helper functions for the Commitment, Prover and Verifier
 # --------------------------------------------------------
-
-
-def apply_challenge(poly, perm, signs, inverse=False):
-    """
-    Apply a permutation and sign flips to the coefficients of a polynomial,
-    or apply the inverse if inverse=True.
-
-    Args:
-        poly: a challenge polynomial from the challenge space
-        perm: permutation of indices 0..N-1 (π)
-        signs: list of 60 booleans, True means flip the sign of the i-th non-zero coefficient
-        inverse: if True, apply the inverse permutation; if False, apply the forward permutation.
-
-    Returns:
-        the transformed polynomial
-    """
-    coeffs = poly.list()
-    non_zero_positions = [i for i, c in enumerate(coeffs) if c != 0]
-    assert len(non_zero_positions) == 60, f"Expected 60 non-zero coefficients, got {len(non_zero_positions)}"
-
-    new_coeffs = [0] * N
-
-    if not inverse:
-        # Forward: π(f)
-        rank = {pos: idx for idx, pos in enumerate(sorted(non_zero_positions))}
-
-        for i, c in enumerate(coeffs):
-            if c != 0:
-                new_idx = perm[i]  # get the index that the value should be moved to
-                flip = -1 if signs[rank[i]] else 1  # flip sign if the corresponding bit is set
-                new_coeffs[new_idx] = c * flip  # save new value in its new location
-    else:
-        # Inverse: recover f from g = π(f)
-        inv_perm = [0] * N
-
-        for i, p in enumerate(perm):
-            inv_perm[p] = i
-
-        original_positions = [inv_perm[q] for q in non_zero_positions]
-        sorted_original = sorted(original_positions)
-        pos_to_idx = {p: idx for idx, p in enumerate(sorted_original)}
-
-        for q, c in zip(non_zero_positions, [coeffs[q] for q in non_zero_positions]):
-            p = inv_perm[q]
-            k = pos_to_idx[p]
-            flip = -1 if signs[k] else 1
-            new_coeffs[p] = c * flip
-
-    return Rq(new_coeffs)
 
 
 def norm_rq_vector(vec):
