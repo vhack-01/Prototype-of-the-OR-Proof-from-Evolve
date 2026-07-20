@@ -19,14 +19,14 @@ def generate_commitment_key():  # Keygen
             the public commitment key
     """
     # (1) Generate random module matrix
-    A_prime = sg.matrix(Rq, D, D + 1, lambda i, j: Rq.random_element())
+    A_prime = sg.random_matrix(Rq, D, D + 1)
 
     # (2) Construct matrix A by appending an identity matrix to A_prime
     I_d = sg.identity_matrix(Rq, D)
     A = A_prime.augment(I_d)
 
     # (3) Generate random row vector
-    B = sg.matrix(Rq, 1, 2 * D + 1, lambda i, j: Rq.random_element())
+    B = sg.random_matrix(Rq, 1, 2 * D + 1)
 
     # (4) Create final commitment key
     C = A.stack(B)
