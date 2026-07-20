@@ -15,8 +15,8 @@ from config.ring import Rq
 P = sg.ZZ['x']
 
 # Create one sampler for each standard deviation
-commitment_sampler = DiscreteGaussianDistributionPolynomialSampler(P, N, SIGMA_COMMITMENT)
-proof_sampler = DiscreteGaussianDistributionPolynomialSampler(P, N, SIGMA_OR)
+COMMITMENT_SAMPLER = DiscreteGaussianDistributionPolynomialSampler(P, N, SIGMA_COMMITMENT)
+PROOF_SAMPLER = DiscreteGaussianDistributionPolynomialSampler(P, N, SIGMA_OR)
 
 # Number of polynomials in a randomness vector
 NUM_POLYS = 2 * D + 1
@@ -49,7 +49,7 @@ def sample_randomness_commitment():
     Returns:
         vector over Rq
     """
-    return sample_randomness(commitment_sampler)
+    return sample_randomness(COMMITMENT_SAMPLER)
 
 
 def sample_randomness_or_proof():
@@ -59,4 +59,4 @@ def sample_randomness_or_proof():
     Returns:
         vector over Rq
     """
-    return sample_randomness(proof_sampler)
+    return sample_randomness(PROOF_SAMPLER)
