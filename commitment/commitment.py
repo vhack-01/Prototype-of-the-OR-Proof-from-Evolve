@@ -18,11 +18,19 @@ def generate_commitment_key():  # Keygen
         Returns:
             the public commitment key
     """
+    # (1) Generate random module matrix
     A_prime = sg.matrix(Rq, D, D + 1, lambda i, j: Rq.random_element())
+
+    # (2) Construct matrix A by appending an identity matrix to A_prime
     I_d = sg.identity_matrix(Rq, D)
     A = A_prime.augment(I_d)
+
+    # (3) Generate random row vector
     B = sg.matrix(Rq, 1, 2 * D + 1, lambda i, j: Rq.random_element())
+
+    # (4) Create final commitment key
     C = A.stack(B)
+
     return C
 
 
@@ -38,9 +46,13 @@ def commit(C, m):  # Commit
             the commitment vector (length D+1)
             the randomness vector (length 2D+1)
     """
+    # (1) Sample short randomness
     r = sample_randomness_commitment()
+
+    # (2) Compute commitment
     v: sg.vector = sg.vector(Rq, [0] * D + [m])
     c = C * r + v
+
     return c, r
 
 
@@ -67,9 +79,10 @@ def open(C, c, r):  # Open
     # (b) Check norm bound
     norm_r = norm_rq_vector(r)
     if norm_r > B_R:
-        # (3) If something is invalid, return None
+        # (3) If the norm is too big, return None
         return None
 
     # (2) Extract the message from the last row and return it
     m_actual = diff[D][0].lift_centered()
+
     return m_actual
