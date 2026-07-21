@@ -27,8 +27,7 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
     t0 = C * r0 - f0 * c
 
     # (2) Compute t_1
-    vec = sg.vector(Rq, [0] * D + [1])
-    t1 = C * r1 + f1 * vec - f1 * c
+    t1 = C * r1 + f1 * sg.vector(Rq, [0] * D + [1]) - f1 * c
 
     # (3) Recompute challenge π
     perm, signs = hash_to_challenge(c, t0, t1)
@@ -57,16 +56,17 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
 #  Helper Functions for the Verifier
 # --------------------------------------------------------
 
-def is_valid_challenge_polynomial(f):
+def is_valid_challenge_polynomial(poly):
     """
         Check that f is a valid challenge polynomial (has exactly 60 non-zero coefficients, each being in {-1, 1}).
 
         Args:
-            f: challenge polynomial
+            poly: challenge polynomial
 
         Returns:
             True if f is a valid challenge polynomial, False otherwise.
     """
-    nonzeros = [c for c in f.list() if c != 0]
+    nonzeros = [c for c in poly.list() if c != 0]
 
+    # skip c.lift_centered() to increase performance and just check {Q-1, 1} instead of {-1, 1}
     return len(nonzeros) == 60 and all(c in (1, Q - 1) for c in nonzeros)
