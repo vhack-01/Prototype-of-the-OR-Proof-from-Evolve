@@ -32,7 +32,7 @@ def serialize_rq_vector(vec):
         Returns:
             concatenated bytes of each polynomial
     """
-    data = b''
+    parts = []
     for poly in vec:
-        data += struct.pack('<' + 'i' * N, *[int(c.lift_centered()) for c in poly.list()])
-    return data
+        parts.append(struct.pack('<' + 'i' * N, *[int(c.lift_centered()) for c in poly.list()]))
+    return b''.join(parts)
