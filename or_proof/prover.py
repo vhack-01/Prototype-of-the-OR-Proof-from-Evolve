@@ -89,12 +89,12 @@ def generate_or_proof(m, C, c, r):
 def generate_challenge_polynomial():
     """
         Pick a random challenge polynomial from the challenge space.
-        The polynomial must have exactly 60 non-zero coefficients, each being in {-1, 1} (see EVOLVE paper section 3.2).
+        The polynomial must have exactly 60 nonzero coefficients, each being in {-1, 1} (see EVOLVE paper section 3.2).
 
         Returns:
             the challenge polynomial
     """
-    indices = SECURE_RNG.sample(range(N), 60)  # choose 60 random indices that will have non-zero coefficients
+    indices = SECURE_RNG.sample(range(N), 60)  # choose 60 random indices that will have nonzero coefficients
     coeffs = [0] * N
     for idx in indices:
         coeffs[idx] = SECURE_RNG.choice([1, -1])

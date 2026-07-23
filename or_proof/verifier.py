@@ -58,7 +58,7 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
 
 def is_valid_challenge_polynomial(poly):
     """
-        Check that f is a valid challenge polynomial (has exactly 60 non-zero coefficients, each being in {-1, 1}).
+        Check that f is a valid challenge polynomial (has exactly 60 nonzero coefficients, each being in {-1, 1}).
 
         Args:
             poly: challenge polynomial
