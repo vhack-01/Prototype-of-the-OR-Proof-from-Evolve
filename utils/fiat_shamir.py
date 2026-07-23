@@ -73,29 +73,28 @@ def apply_challenge(poly, perm, signs, inverse=False):
     """
     coeffs = poly.list()
     non_zero_positions = [i for i, c in enumerate(coeffs) if c != 0]
-    assert len(non_zero_positions) == 60, f"Expected 60 non-zero coefficients, got {len(non_zero_positions)}"
+    assert len(non_zero_positions) == 60, f"Expected 60 nonzero coefficients, got {len(non_zero_positions)}"
 
     new_coeffs = [0] * N
 
-    if not inverse:
-        # Forward: π(f)
-        for idx, p in enumerate(non_zero_positions):
-            c = coeffs[p]
+    if not inverse:  # Forward: π(f)
+        # flip and permute
+        for idx, pos in enumerate(non_zero_positions):
             flip = -1 if signs[idx] else 1
-            new_coeffs[perm[p]] = c * flip
-    else:
-        # Inverse: recover f from g = π(f)
+            new_coeffs[perm[pos]] = coeffs[pos] * flip
+
+    else:  # Inverse: recover f from g = π(f)
+        # invert permutation
         inv_perm = [0] * N
+        for idx, pos in enumerate(perm):
+            inv_perm[pos] = idx
 
-        for i, p in enumerate(perm):
-            inv_perm[p] = i
+        # get original nonzero positions
+        original_non_zero_positions = sorted(inv_perm[q] for q in non_zero_positions)
 
-        # original positions that are non-zero in g
-        original_positions = sorted(inv_perm[q] for q in non_zero_positions)
-        for idx, p in enumerate(original_positions):
-            q = perm[p]  # where this coefficient landed in g
-            c = coeffs[q]  # value in g at that position
+        # permute and flip
+        for idx, pos in enumerate(original_non_zero_positions):
             flip = -1 if signs[idx] else 1
-            new_coeffs[p] = c * flip
+            new_coeffs[pos] = coeffs[perm[pos]] * flip
 
     return Rq(new_coeffs)
