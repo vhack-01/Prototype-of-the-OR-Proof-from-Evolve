@@ -72,14 +72,14 @@ def apply_challenge(poly, perm, signs, inverse=False):
         the transformed polynomial
     """
     coeffs = poly.list()
-    non_zero_positions = [i for i, c in enumerate(coeffs) if c != 0]
-    assert len(non_zero_positions) == 60, f"Expected 60 nonzero coefficients, got {len(non_zero_positions)}"
+    nonzero_positions = [i for i, c in enumerate(coeffs) if c != 0]
+    assert len(nonzero_positions) == 60, f"Expected 60 nonzero coefficients, got {len(nonzero_positions)}"
 
     new_coeffs = [0] * N
 
     if not inverse:  # Forward: π(f)
         # flip and permute
-        for idx, pos in enumerate(non_zero_positions):
+        for idx, pos in enumerate(nonzero_positions):
             flip = -1 if signs[idx] else 1
             new_coeffs[perm[pos]] = coeffs[pos] * flip
 
@@ -90,10 +90,10 @@ def apply_challenge(poly, perm, signs, inverse=False):
             inv_perm[pos] = idx
 
         # get original nonzero positions
-        original_non_zero_positions = sorted(inv_perm[q] for q in non_zero_positions)
+        original_nonzero_positions = sorted(inv_perm[q] for q in nonzero_positions)
 
         # permute and flip
-        for idx, pos in enumerate(original_non_zero_positions):
+        for idx, pos in enumerate(original_nonzero_positions):
             flip = -1 if signs[idx] else 1
             new_coeffs[pos] = coeffs[perm[pos]] * flip
 
