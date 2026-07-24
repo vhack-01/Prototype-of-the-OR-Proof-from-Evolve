@@ -1,4 +1,3 @@
-import random
 from math import exp
 import secrets
 
