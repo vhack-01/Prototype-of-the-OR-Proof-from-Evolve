@@ -42,6 +42,14 @@ All commands described below must be executed inside a SageMath environment.
   ```bash
   python -m tests.tests
   ```
+- The line coverage is 100% (excluding the entry-point scripts, and the tests/benchmark module), measured
+  using ``coverage``. A configuration file ``.coveragerc`` has been added to the
+  repo for convenience. The coverage can be checked by running the following command from project root:
+
+```bash
+  coverage run -m tests.tests
+  coverage report -m
+```
 
 ## References
 
