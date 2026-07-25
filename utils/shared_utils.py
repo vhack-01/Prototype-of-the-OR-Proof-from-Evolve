@@ -11,7 +11,7 @@ from config.params import N
 
 def norm_rq_vector(vec):
     """
-        Compute the Euclidean norm of a vector of polynomials in Rq
+        Compute the Euclidean norm of a vector of polynomials in Rq, using the centered representation of coefficients
 
         Args:
             vec: vector over Rq
