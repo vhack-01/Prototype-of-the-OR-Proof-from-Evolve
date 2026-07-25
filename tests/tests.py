@@ -1,12 +1,16 @@
 from datetime import datetime
+from math import sqrt
 
 import sage.all as sg
 
 from commitment.commitment import open, commit, generate_commitment_key
-from or_proof.prover import generate_or_proof
-from or_proof.verifier import verify_or_proof
+from or_proof.prover import generate_or_proof, generate_challenge_polynomial
+from or_proof.verifier import verify_or_proof, is_valid_challenge_polynomial
 from config.ring import Rq
+from config.params import D, N, Q, B_R, B_OR_PRIME
 from simulate_or_proof import simulate_or_proof
+from utils.gaussian_sampler import sample_randomness_commitment, sample_randomness_or_proof
+from utils.shared_utils import norm_rq_vector
 
 # Set deterministic seed so tests are reproducible
 SEED = 42
@@ -167,6 +171,83 @@ def test_commitment_homomorphism():
     assert m3 == m1 + m2, "Commitment scheme should be homomorphic"
 
 
+def test_generating_and_validating_challenge_polynomial():
+    """
+        Test the functions "prover.generate_challenge_polynomial" and "verifier.is_valid_challenge_polynomial" together
+    """
+    print("Test generating and validating challenge polynomials...")
+    poly = generate_challenge_polynomial()
+
+    assert is_valid_challenge_polynomial(poly), "Challenge polynomial should be generated and validated correctly"
+
+
+def test_reject_challenge_polynomial_with_too_many_zeroes():
+    """
+        Test that a challenge polynomial with too many zeroes is rejected.
+    """
+    print("Test that a challenge polynomial with too many zeroes is rejected...")
+    coeffs = generate_challenge_polynomial().list()
+
+    # tamper with the polynomial
+    for i in range(N):
+        if coeffs[i] in (-1, 1):
+            coeffs[i] = 0
+            break
+
+    assert not is_valid_challenge_polynomial(Rq(coeffs)), "Malformed challenge polynomial should be rejected"
+
+
+def test_reject_challenge_polynomial_with_invalid_entries():
+    """
+        Test that a challenge polynomial with invalid entries is rejected.
+    """
+    print("Test that a challenge polynomial with invalid entries is rejected...")
+    coeffs = generate_challenge_polynomial().list()
+
+    # tamper with the polynomial
+    for i in range(N):
+        if coeffs[i] in (-1, 1):
+            coeffs[i] = 2
+            break
+
+    assert not is_valid_challenge_polynomial(Rq(coeffs)), "Malformed challenge polynomial should be rejected"
+
+
+def test_norm_rq_vector():
+    """
+        Test that shared_utils.norm_rq_vector works correctly.
+    """
+    print("Testing norm_rq_vector...")
+
+    coeff_lists = [[random.randint(-(Q - 1) // 2, Q // 2) for _ in range(N)] for _ in range(2 * D + 1)]
+    sum_coeffs = sum(coeff ** 2 for coeff_list in coeff_lists for coeff in coeff_list)
+
+    polys = [Rq(coeff_list) for coeff_list in coeff_lists]
+
+    vec = sg.vector(Rq, polys)
+
+    assert norm_rq_vector(vec) == sqrt(sum_coeffs)
+
+
+def test_commitment_randomness_holds_bound():
+    """
+        Test that the randomness vectors sampled for commitments consistently have a small norm.
+    """
+    print("Testing that sample_randomness_commitment produces vectors with small norms...")
+    for _ in range(100):
+        assert norm_rq_vector(sample_randomness_commitment()) <= B_R, "Commitment randomness should have small norm"
+
+
+def test_or_proof_randomness_holds_bound():
+    """
+        Test that the randomness vectors sampled for OR-proofs consistently have a small norm.
+    """
+    print("Testing that sample_randomness_or_proof produces vectors with small norms...")
+    for _ in range(100):
+        assert norm_rq_vector(
+            sample_randomness_or_proof()) <= B_OR_PRIME, "OR-proof randomness should have small norm"
+
+
 def test_random_valid_proofs(iterations=1000):
     """
         Test OR-proof generation and verification for a random m in {0,1} multiple times to ensure it works repeatedly.
@@ -229,6 +310,7 @@ if __name__ == "__main__":
     # Commitment Scheme
     test_commitment_scheme()
     test_commitment_homomorphism()
+    test_commitment_randomness_holds_bound()
 
     # OR-proof
     test_tampered_proof()
@@ -236,12 +318,19 @@ if __name__ == "__main__":
     test_invalid_proof(-1)
     test_invalid_proof(3)
     test_invalid_proof(346334343)
+    test_or_proof_randomness_holds_bound()
 
     # Mixed
     test_tampered_commitment()
     test_mismatch_invalid_commitment_valid_proof()
     test_mismatch_valid_commitment_invalid_proof()
     test_mismatch_valid_commitment_valid_proof()
+
+    # Helper functions
+    test_generating_and_validating_challenge_polynomial()
+    test_reject_challenge_polynomial_with_too_many_zeroes()
+    test_reject_challenge_polynomial_with_invalid_entries()
+    test_norm_rq_vector()
 
     # These tests may run a long time depending on the chosen amount of iterations
     test_random_valid_proofs()
