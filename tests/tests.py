@@ -97,36 +97,37 @@ def test_is_valid_challenge_polynomial_reject_invalid_entries():
     assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with invalid entries was falsely accepted"
 
 
-def test_is_valid_challenge_polynomial_reject_too_many_zeroes():
+def test_is_valid_challenge_polynomial_reject_too_many_nonzeroes():
     """
-        Test that verifier.is_valid_challenge_polynomial rejects a challenge polynomial with too many zeros.
+        Test that verifier.is_valid_challenge_polynomial rejects a challenge polynomial with too many nonzeros.
     """
-    print("Testing verifier.is_valid_challenge_polynomial with too many zeroes...")
+    print("Testing verifier.is_valid_challenge_polynomial with too many nonzeroes...")
 
     # Generate malformed challenge polynomial
-    indices = random.sample(range(N), 59)  # one zero too much
+    indices = random.sample(range(N), 61)  # one nonzero coefficient too much
     coeffs = [0] * N
     for idx in indices:
         coeffs[idx] = random.choice([-1, 1])
     poly = Rq(coeffs)
 
-    assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with too many zeroes was falsely accepted"
+    assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with too many nonzeroes was falsely accepted"
 
 
-def test_is_valid_challenge_polynomial_reject_too_little_zeroes():
+def test_is_valid_challenge_polynomial_reject_too_little_nonzeroes():
     """
-        Test that verifier.is_valid_challenge_polynomial rejects a challenge polynomial with too little zeros.
+        Test that verifier.is_valid_challenge_polynomial rejects a challenge polynomial with too little nonzeros.
     """
     print("Testing verifier.is_valid_challenge_polynomial with too little zeroes...")
 
     # Generate malformed challenge polynomial
-    indices = random.sample(range(N), 61)  # one zero too little
+    indices = random.sample(range(N), 59)  # one nonzero coefficient too little
     coeffs = [0] * N
     for idx in indices:
         coeffs[idx] = random.choice([-1, 1])
     poly = Rq(coeffs)
 
-    assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with too little zeroes was falsely accepted"
+    assert not is_valid_challenge_polynomial(poly), \
+        "Challenge polynomial with too little nonzeroes was falsely accepted"
 
 
 def test_serialize_rq_vector_empty():
@@ -612,8 +613,8 @@ if __name__ == "__main__":
     test_generate_challenge_polynomial()
     test_is_valid_challenge_polynomial_accept()
     test_is_valid_challenge_polynomial_reject_invalid_entries()
-    test_is_valid_challenge_polynomial_reject_too_many_zeroes()
-    test_is_valid_challenge_polynomial_reject_too_little_zeroes()
+    test_is_valid_challenge_polynomial_reject_too_many_nonzeroes()
+    test_is_valid_challenge_polynomial_reject_too_little_nonzeroes()
     test_serialize_rq_vector_empty()
     test_serialize_rq_vector_one_poly()
     test_sample_randomness_commitment()
