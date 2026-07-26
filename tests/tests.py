@@ -620,7 +620,7 @@ if __name__ == "__main__":
     test_sample_randomness_or_proof()
 
     print("\n----------- Integration Tests -----------")
-    print("\n------ Helper functions ------")
+    print("\n------ Helper/Utility functions ------")
     test_generating_and_validating_challenge_polynomial()
     test_commitment_randomness_holds_bound()
     test_or_proof_randomness_holds_bound()
