@@ -299,29 +299,6 @@ def test_commitment_scheme():
     assert m1 == m2, "Opening of a valid commitment failed"
 
 
-def test_commitment_homomorphism():
-    """
-    Test that commitments are additively homomorphic.
-    """
-    print("Testing commitment homomorphism...")
-
-    # Create two commitments
-    m1 = 1
-    m2 = 2
-    C = generate_commitment_key()
-    c1, r1 = commit(C, m1)
-    c2, r2 = commit(C, m2)
-
-    # Sum the commitments and the openings
-    c_sum = c1 + c2
-    r_sum = r1 + r2
-
-    # Open the sum
-    m3 = open(C, c_sum, r_sum)
-
-    assert m3 == m1 + m2, "Commitment scheme should be homomorphic"
-
-
 def test_reject_opening_big_randomness():
     """
         Test that opening a commitment with a big randomness is rejected.
@@ -348,6 +325,29 @@ def test_reject_opening_mismatched_key_and_commitment():
 
     # C is not the one that c was created with
     assert open(C, c, r) is None, "Opening of mismatched commitment key and commitment succeeded but should not have"
+
+
+def test_commitment_homomorphism():
+    """
+    Test that commitments are additively-homomorphic.
+    """
+    print("Testing commitment homomorphism...")
+
+    # Create two commitments
+    m1 = 1
+    m2 = 2
+    C = generate_commitment_key()
+    c1, r1 = commit(C, m1)
+    c2, r2 = commit(C, m2)
+
+    # Sum the commitments and the openings
+    c_sum = c1 + c2
+    r_sum = r1 + r2
+
+    # Open the sum
+    m3 = open(C, c_sum, r_sum)
+
+    assert m3 == m1 + m2, "Commitment scheme should be homomorphic"
 
 
 # ----------------------------------------
@@ -530,6 +530,20 @@ def test_mismatch_valid_commitment_invalid_proof():
     assert not verify_or_proof(C, c, r0, r1, f0, f1), "Proof verification should fail"
 
 
+def test_mismatch_invalid_commitment_invalid_proof():
+    """
+        Generate commitment and OR-proof with different invalid messages. Verifying should fail.
+    """
+    print("Testing that verification fails if commitment and proof were generated with "
+          "different invalid messages...")
+
+    C = generate_commitment_key()
+    c, r = commit(C, 5)
+    r0, r1, f0, f1, _ = generate_or_proof(-1, C, c, r)
+
+    assert not verify_or_proof(C, c, r0, r1, f0, f1), "Proof verification should fail"
+
+
 def test_mismatch_valid_commitment_valid_proof():
     """
         Generate commitment and OR-proof with valid, but different messages. Verifying should fail.
@@ -630,9 +644,9 @@ if __name__ == "__main__":
 
     print("------ Commitment Scheme ------")
     test_commitment_scheme()
-    test_commitment_homomorphism()
     test_reject_opening_big_randomness()
     test_reject_opening_mismatched_key_and_commitment()
+    test_commitment_homomorphism()
 
     print("\n------ OR-proof ------")
     test_valid_proofs()
@@ -645,11 +659,12 @@ if __name__ == "__main__":
     test_tampered_proof_f0()
     test_tampered_proof_f1()
     test_mismatch_invalid_commitment_valid_proof()
+    test_mismatch_invalid_commitment_invalid_proof()
     test_mismatch_valid_commitment_invalid_proof()
     test_mismatch_valid_commitment_valid_proof()
 
     ## these may run a long time depending on the chosen amount of iterations
-    ## with iterations=1000 each takes about 3min
+    ## with iterations=1000 each takes about 3 min
     test_random_proofs(1000)
     test_rejection_sampling(1000)
 
