@@ -634,7 +634,7 @@ if __name__ == "__main__":
     test_reject_opening_big_randomness()
     test_reject_opening_mismatched_key_and_commitment()
 
-    print("\n------ OR-Proof ------")
+    print("\n------ OR-proof ------")
     test_valid_proofs()
     test_invalid_proof(-1)
     test_invalid_proof(2)
