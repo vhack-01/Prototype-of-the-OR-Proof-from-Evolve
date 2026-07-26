@@ -596,10 +596,6 @@ def test_rejection_sampling(iterations=1000):
 
     attempts_counter = 0
 
-    # Warm-up
-    for _ in range(3):
-        simulate_or_proof(0)
-
     # Main
     for _ in range(iterations):
         m = random.randint(0, 1)
