@@ -663,7 +663,7 @@ if __name__ == "__main__":
     test_mismatch_valid_commitment_invalid_proof()
     test_mismatch_valid_commitment_valid_proof()
 
-    ## these may run a long time depending on the chosen amount of iterations
+    ## these may run a long time depending on the chosen iterations
     ## with iterations=1000 each takes about 3 min
     test_random_proofs(1000)
     test_rejection_sampling(1000)
