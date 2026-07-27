@@ -2,7 +2,7 @@ import time
 import struct
 from datetime import datetime
 
-from commitment.commitment import generate_commitment_key, commit
+from commitment.commitment import generate_commitment_key, commit, open
 from or_proof.prover import generate_or_proof
 from or_proof.verifier import verify_or_proof
 from simulate_or_proof import simulate_or_proof
@@ -12,13 +12,13 @@ from config.params import N_A
 
 # --------------------------------------------------------
 #  Functions for Benchmarking
+#  The main function can be found at the end of the file.
 # --------------------------------------------------------
 
 
 def benchmark_proof_size():
     """
-    Measure the size of a voter's contribution to the bulletin board (one OR-proof, one commitment/authority)
-    and compare with the paper's numbers.
+    Measure the size of a voter's contribution to the bulletin board (one OR-proof, one commitment per authority).
     """
     print("Benchmarking voter-side sizes")
 
@@ -27,7 +27,7 @@ def benchmark_proof_size():
     c, r = commit(C, 0)
     r0, r1, f0, f1, _ = generate_or_proof(0, C, c, r)
 
-    # Sizes of individual components
+    # Size of the commitment (c)
     commitment_size = len(serialize_rq_vector(c))
     print(f"    Commitment size (per authority): {commitment_size / 1024:.1f} KB")
 
@@ -46,10 +46,9 @@ def benchmark_proof_size():
     print(f"\nVoter contribution ({N_A} commitments + OR-proof):")
     print(f"    Total size: {total / 1024:.1f} KB")
     print(f"    Average per authority: {avg_per_authority_no_cipher / 1024:.1f} KB")
-    print("    (Paper reports ~78 KB total and ~20 KB per authority)")
 
 
-def benchmark_run_times(iterations=10000):
+def benchmark_run_times(iterations=11000):
     """
         Run benchmarking for the run times.
 
@@ -59,7 +58,9 @@ def benchmark_run_times(iterations=10000):
     current_time_start = datetime.now().strftime("%H:%M:%S")
     print(f"Benchmarking of run times started at {current_time_start} | Running {iterations} iterations")
 
-    times_commitment = []
+    times_key = []
+    times_commit = []
+    times_open = []
     times_prover = []
     times_verifier = []
 
@@ -69,19 +70,31 @@ def benchmark_run_times(iterations=10000):
         simulate_or_proof(1)
 
     for _ in range(iterations):
-        commit_start = time.perf_counter()
+        # Measure commitment key generation time
+        key_start = time.perf_counter()
         C = generate_commitment_key()
+        key_end = time.perf_counter()
+        times_key.append(key_end - key_start)
+
+        # Measure commitment generation time
+        commit_start = time.perf_counter()
         c, r = commit(C, 0)
         commit_end = time.perf_counter()
-        times_commitment.append(commit_end - commit_start)
+        times_commit.append(commit_end - commit_start)
 
-        # Measure generation time
+        # Measure commitment opening time
+        open_start = time.perf_counter()
+        open(C, c, r)
+        open_end = time.perf_counter()
+        times_open.append(open_end - open_start)
+
+        # Measure proof generation time
         gen_start = time.perf_counter()
         r0, r1, f0, f1, attempts = generate_or_proof(0, C, c, r)
         gen_end = time.perf_counter()
         times_prover.append(gen_end - gen_start)
 
-        # Measure verification time
+        # Measure proof verification time
         verify_start = time.perf_counter()
         is_valid = verify_or_proof(C, c, r0, r1, f0, f1)
         verify_end = time.perf_counter()
@@ -90,20 +103,22 @@ def benchmark_run_times(iterations=10000):
         assert is_valid, "Proof verification failed"
 
     # Calculate averages
-    avg_time_commitment = sum(times_commitment) / len(times_commitment)
+    avg_time_key = sum(times_key) / len(times_key)
+    avg_time_commit = sum(times_commit) / len(times_commit)
+    avg_time_open = sum(times_open) / len(times_open)
     avg_time_prover = sum(times_prover) / len(times_prover)
     avg_time_verifier = sum(times_verifier) / len(times_verifier)
 
     # Output results
-    print(f"    Average commitment time: {avg_time_commitment * 1000:.0f} ms")
+    print(f"    Average commitment key generation time: {avg_time_key * 1000:.0f} ms")
+    print(f"    Average commit time: {avg_time_commit * 1000:.0f} ms")
+    print(f"    Average open time: {avg_time_open * 1000:.0f} ms")
     print(f"    Average proof generation time: {avg_time_prover * 1000:.0f} ms")
     print(f"    Average proof verification time: {avg_time_verifier * 1000:.0f} ms")
 
-    # Compare to paper
-    voter_time = avg_time_prover + N_A * avg_time_commitment
-    print(f"\nVoter time ({N_A} commitments + OR-proof):")
+    voter_time = N_A * avg_time_commit + avg_time_prover
+    print(f"\nVoter time ({N_A} commitments + one OR-proof):")
     print(f"    Total time: {voter_time * 1000:.0f} ms")
-    print("    (Paper reports ~8.5 ms)")
 
     current_time_end = datetime.now().strftime("%H:%M:%S")
     print("Benchmarking of run times finished at", current_time_end)
@@ -121,7 +136,7 @@ def serialize_challenge(f):
             f: challenge polynomial
 
         Returns:
-            serialized polynomial as 60 indices (2 bytes each) followed by a 8-byte sign mask
+            serialized polynomial as 60 indices (2 bytes each) followed by an 8-byte sign mask
     """
     coeffs = f.list()
     indices = []
@@ -143,4 +158,4 @@ def serialize_challenge(f):
 
 if __name__ == "__main__":
     benchmark_proof_size()
-    benchmark_run_times()
+    benchmark_run_times(11000)
