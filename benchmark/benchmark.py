@@ -90,7 +90,7 @@ def benchmark_run_times(iterations=11000):
 
         # Measure proof generation time
         gen_start = time.perf_counter()
-        r0, r1, f0, f1, attempts = generate_or_proof(0, C, c, r)
+        r0, r1, f0, f1, _ = generate_or_proof(0, C, c, r)
         gen_end = time.perf_counter()
         times_prover.append(gen_end - gen_start)
 
