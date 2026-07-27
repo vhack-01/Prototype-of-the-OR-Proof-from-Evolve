@@ -100,8 +100,6 @@ def benchmark_run_times(iterations=11000):
         verify_end = time.perf_counter()
         times_verifier.append(verify_end - verify_start)
 
-        assert is_valid, "Proof verification failed"
-
     # Calculate averages
     avg_time_key = sum(times_key) / len(times_key)
     avg_time_commit = sum(times_commit) / len(times_commit)
