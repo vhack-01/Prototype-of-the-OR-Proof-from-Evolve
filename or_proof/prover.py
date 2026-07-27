@@ -118,12 +118,12 @@ def rejection_sample_keep(r_m, f_m, r):
     v = f_m * r
 
     # Convert to integer coefficient vectors (centered, see EVOLVE paper section 2.1)
-    r_m_ints = [c.lift_centered() for poly in r_m for c in poly.list()]
-    v_ints = [c.lift_centered() for poly in v for c in poly.list()]
+    r_m_vec = sg.vector(sg.ZZ, [c.lift_centered() for poly in r_m for c in poly.list()])
+    v_vec = sg.vector(sg.ZZ, [c.lift_centered() for poly in v for c in poly.list()])
 
     # Compute squared Euclidean norm and dot product
-    v_norm2 = sum(i ** 2 for i in v_ints)
-    dot = sum(r_m_ints[i] * v_ints[i] for i in range(len(r_m_ints)))
+    v_norm2 = v_vec.norm() ** 2
+    dot = r_m_vec * v_vec
 
     # Compute exponent = (||v||^2 - 2<r_m,v>) / (2σ^2)
     exponent = (v_norm2 - 2 * dot) / (2.0 * (SIGMA_OR ** 2))
