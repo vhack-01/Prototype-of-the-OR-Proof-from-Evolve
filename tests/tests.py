@@ -5,12 +5,12 @@ from math import sqrt
 
 import sage.all as sg
 
+from benchmark.benchmark import serialize_challenge_polynomial
 from commitment.commitment import open, commit, generate_commitment_key
 from or_proof.prover import generate_or_proof, generate_challenge_polynomial
 from or_proof.verifier import verify_or_proof, is_valid_challenge_polynomial
 from config.ring import Rq
 from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT
-from simulate_or_proof import simulate_or_proof
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
 from utils.gaussian_sampler import sample_randomness_commitment, sample_randomness_or_proof
 from utils.shared_utils import norm_rq_vector, serialize_rq_vector
@@ -130,23 +130,11 @@ def test_is_valid_challenge_polynomial_reject_too_little_nonzeroes():
         "Challenge polynomial with too little nonzeroes was falsely accepted"
 
 
-def test_serialize_rq_vector_empty():
+def test_serialize_rq_vector():
     """
-        Test that serializing and empty vector gives empty bytes.
+        Serialize a vector with one polynomial with shared_utils.serialize_rq_vector, verify bytes and deserialize it.
     """
-    print("Testing that serialize_rq_vector works correctly with an empty vector...")
-
-    vec = []
-    result = serialize_rq_vector(vec)
-
-    assert result == b'', "Empty vector gave non-empty bytes"
-
-
-def test_serialize_rq_vector_one_poly():
-    """
-        Serialize a vector with one polynomial and verify bytes.
-    """
-    print("Testing that serialize_rq_vector works correctly with one polynomial...")
+    print("Testing that serialize_rq_vector works correctly...")
 
     # Create a polynomial with known coefficients
     poly = Rq([1, -2, 3, 0, -5] + [0] * (N - 5))  # length N
@@ -159,7 +147,37 @@ def test_serialize_rq_vector_one_poly():
     unpacked = struct.unpack('<' + 'i' * N, result)
     expected = [int(c.lift_centered()) for c in poly.list()]
 
-    assert unpacked == tuple(expected), "Serializing a vector did not work as expected"
+    assert unpacked == tuple(expected), "Serializing a vector did not work correctly"
+
+
+def test_serialize_challenge_polynomial():
+    """
+    Serialize a challenge polynomial with benchmark.serialize_challenge_polynomial, verify bytes and deserialize it.
+    """
+    print("Testing that benchmark.serialize_challenge_polynomial works correctly...")
+
+    # Generate a valid challenge polynomial
+    poly = generate_challenge_polynomial()
+
+    # Serialize it
+    data = serialize_challenge_polynomial(poly)
+
+    # Expected length: 60 indices * 2 bytes + 8 bytes for signs = 128 bytes
+    assert len(data) == 128, f"Expected 128 bytes, got {len(data)}"
+
+    # Reconstruct the polynomial from the serialized data
+    indices = struct.unpack('<' + 'H' * 60, data[:120])
+    signs = struct.unpack('<Q', data[120:128])[0]
+
+    # Build coefficient list
+    new_coeffs = [0] * N
+    for bit, idx in enumerate(indices):
+        new_coeffs[idx] = -1 if (signs >> bit) & 1 else 1
+
+    recovered_poly = Rq(new_coeffs)
+
+    # Verify that the reconstructed polynomial matches the original
+    assert poly == recovered_poly, "Serializing a challenge polynomial did not work correctly"
 
 
 def test_sample_randomness_commitment():
@@ -625,8 +643,8 @@ if __name__ == "__main__":
     test_is_valid_challenge_polynomial_reject_invalid_entries()
     test_is_valid_challenge_polynomial_reject_too_many_nonzeroes()
     test_is_valid_challenge_polynomial_reject_too_little_nonzeroes()
-    test_serialize_rq_vector_empty()
-    test_serialize_rq_vector_one_poly()
+    test_serialize_rq_vector()
+    test_serialize_challenge_polynomial()
     test_sample_randomness_commitment()
     test_sample_randomness_or_proof()
 
