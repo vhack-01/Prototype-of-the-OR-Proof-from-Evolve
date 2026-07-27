@@ -29,13 +29,13 @@ def benchmark_proof_size():
 
     # Size of the commitment (c)
     commitment_size = len(serialize_rq_vector(c))
-    print(f"    Commitment size (per authority): {commitment_size / 1024:.1f} KB")
+    print(f"    Commitment size: {commitment_size / 1024:.1f} KB")
 
     # Size of the OR-proof (r0, r1, f0, f1)
     proof_bytes = (serialize_rq_vector(r0) +
                    serialize_rq_vector(r1) +
-                   serialize_challenge(f0) +
-                   serialize_challenge(f1))
+                   serialize_challenge_polynomial(f0) +
+                   serialize_challenge_polynomial(f1))
     proof_size = len(proof_bytes)
     print(f"    OR-proof size: {proof_size / 1024:.1f} KB")
 
@@ -126,22 +126,21 @@ def benchmark_run_times(iterations=11000):
 #  Helper Functions for Benchmarking
 # --------------------------------------------------------
 
-def serialize_challenge(f):
+def serialize_challenge_polynomial(poly):
     """
         Serialize a challenge polynomial.
 
         Args:
-            f: challenge polynomial
+            poly: challenge polynomial
 
         Returns:
             serialized polynomial as 60 indices (2 bytes each) followed by an 8-byte sign mask
     """
-    coeffs = f.list()
     indices = []
     signs = 0
     bit = 0
 
-    for i, c in enumerate(coeffs):
+    for i, c in enumerate(poly.list()):
         if c != 0:
             indices.append(i)
             if c.lift_centered() == -1:
