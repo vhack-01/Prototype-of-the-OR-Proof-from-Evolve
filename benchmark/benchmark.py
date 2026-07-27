@@ -96,7 +96,7 @@ def benchmark_run_times(iterations=11000):
 
         # Measure proof verification time
         verify_start = time.perf_counter()
-        is_valid = verify_or_proof(C, c, r0, r1, f0, f1)
+        verify_or_proof(C, c, r0, r1, f0, f1)
         verify_end = time.perf_counter()
         times_verifier.append(verify_end - verify_start)
 
