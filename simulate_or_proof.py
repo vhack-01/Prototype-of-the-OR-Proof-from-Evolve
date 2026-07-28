@@ -23,10 +23,10 @@ def simulate_or_proof(m):
     C = commitment.generate_commitment_key()
 
     # Simulate a voter
-    r0, r1, f0, f1, commitments = simulate_voter(C, m)
+    r0, r1, f0, f1, c = simulate_voter(C, m)
 
     # Verify the OR-proof that was created by the voter
-    is_valid = verifier.verify_or_proof(C, sum(commitments), r0, r1, f0, f1)
+    is_valid = verifier.verify_or_proof(C, c, r0, r1, f0, f1)
 
     return is_valid
 
@@ -53,15 +53,16 @@ def simulate_voter(C, m):
         randomness.append(r)
 
     # (4) + (5) Sum all commitments and randomness
+    summed_commitments = sum(commitments)
     summed_randomness = sum(randomness)
 
     # (6) Generate the OR-proof
-    r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, sum(commitments), summed_randomness)
+    r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, summed_commitments, summed_randomness)
 
     # (7) - (9) Encrypt each randomness and post them + all commitments + OR-proof to the bulletin board
     # out of scope for us
 
-    return r0, r1, f0, f1, commitments
+    return r0, r1, f0, f1, summed_commitments
 
 
 def split_vote(v_i):
