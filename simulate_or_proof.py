@@ -19,9 +19,28 @@ def simulate_or_proof(m):
         Returns:
             True if the OR-proof was valid, False otherwise.
     """
-    # Create a public commitment key (usually it is public and given to the voter)
+    # Create a public commitment key
     C = commitment.generate_commitment_key()
 
+    # Simulate a voter
+    r0, r1, f0, f1, commitments = simulate_voter(C, m)
+
+    # Verify the OR-proof that was created by the voter
+    is_valid = verifier.verify_or_proof(C, sum(commitments), r0, r1, f0, f1)
+
+    return is_valid
+
+
+def simulate_voter(C, m):
+    """
+        Simulate a voter that votes for the message m. Implements the Vote_i algorithm from (EVOLVE paper section 4.1).
+
+        Args:
+            m: the vote
+
+        Returns:
+            r0, r1, f0, f1, commitments
+    """
     # (1) Split the vote into N_A shares
     vote_list = split_vote(m)
 
@@ -34,19 +53,15 @@ def simulate_or_proof(m):
         randomness.append(r)
 
     # (4) + (5) Sum all commitments and randomness
-    summed_commitments = sum(commitments)
     summed_randomness = sum(randomness)
 
     # (6) Generate the OR-proof
-    r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, summed_commitments, summed_randomness)
+    r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, sum(commitments), summed_randomness)
 
     # (7) - (9) Encrypt each randomness and post them + all commitments + OR-proof to the bulletin board
     # out of scope for us
 
-    # Verify the OR-proof
-    is_valid = verifier.verify_or_proof(C, summed_commitments, r0, r1, f0, f1)
-
-    return is_valid
+    return r0, r1, f0, f1, commitments
 
 
 def split_vote(v_i):
