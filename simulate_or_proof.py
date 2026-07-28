@@ -41,6 +41,7 @@ def simulate_or_proof(m):
     r0, r1, f0, f1, _ = prover.generate_or_proof(m, C, summed_commitments, summed_randomness)
 
     # (7) - (9) Encrypt each randomness and post them + all commitments + OR-proof to the bulletin board
+    # out of scope for us
 
     # Verify the OR-proof
     is_valid = verifier.verify_or_proof(C, summed_commitments, r0, r1, f0, f1)
