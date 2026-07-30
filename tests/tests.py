@@ -10,7 +10,8 @@ from commitment.commitment import open, commit, generate_commitment_key
 from or_proof.prover import generate_or_proof, generate_challenge_polynomial
 from or_proof.verifier import verify_or_proof, is_valid_challenge_polynomial
 from config.ring import Rq
-from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT
+from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT, N_A
+from simulate_or_proof import split_vote
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
 from utils.gaussian_sampler import sample_randomness_commitment, sample_randomness_or_proof
 from utils.shared_utils import norm_rq_vector, serialize_rq_vector
@@ -152,7 +153,7 @@ def test_serialize_rq_vector():
 
 def test_serialize_challenge_polynomial():
     """
-    Serialize a challenge polynomial with benchmark.serialize_challenge_polynomial, verify bytes and deserialize it.
+        Serialize a challenge polynomial with benchmark.serialize_challenge_polynomial, verify bytes and deserialize it.
     """
     print("Testing that benchmark.serialize_challenge_polynomial works correctly...")
 
@@ -180,7 +181,24 @@ def test_serialize_challenge_polynomial():
     assert poly == recovered_poly, "Serializing a challenge polynomial did not work correctly"
 
 
+def test_split_vote():
+    """
+        Test that simulate_or_proof.split_vote yields a valid result for both valid votes.
+    """
+    print("Testing simulate_or_proof.split_vote...")
+
+    for m in (0, 1):
+        shares = split_vote(m)
+
+        assert len(shares) == N_A
+        assert sum(shares) % Q == m
+
+
 def test_sample_randomness_commitment():
+    """
+        Test that gaussian_sampler.sample_randomness_commitment yields a result
+        with standard deviation roughly SIGMA_COMMITMENT.
+    """
     print("Testing that the standard deviation of the values in the vector returned by "
           "gaussian_sampler.sample_randomness_commitment is roughly SIGMA_COMMITMENT...")
 
@@ -195,6 +213,10 @@ def test_sample_randomness_commitment():
 
 
 def test_sample_randomness_or_proof():
+    """
+        Test that gaussian_sampler.sample_randomness_or_proof yields a result
+        with standard deviation roughly SIGMA_OR.
+    """
     print("Testing that the standard deviation of the values in the vector returned by "
           "gaussian_sampler.sample_randomness_or_proof is roughly SIGMA_OR...")
 
@@ -645,6 +667,7 @@ if __name__ == "__main__":
     test_is_valid_challenge_polynomial_reject_too_little_nonzeroes()
     test_serialize_rq_vector()
     test_serialize_challenge_polynomial()
+    test_split_vote()
     test_sample_randomness_commitment()
     test_sample_randomness_or_proof()
 
