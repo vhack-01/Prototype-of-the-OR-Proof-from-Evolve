@@ -1,9 +1,11 @@
 # Prototypical Implementation of the OR-proof from 'EVOLVE'
 
-This repository contains a prototypical implementation of the **OR-proof** described in the paper  
+This repository contains a prototypical implementation of the commitment scheme and **OR-proof** described in the paper  
 "Practical Quantum-Safe Voting from Lattices" (see [References](#references)). The OR-proof allows a prover to
 demonstrate that a lattice-based commitment opens to either **0** or **1**,
 without revealing which, and without leaking the witness.
+
+This implementation is for demonstration purposes only, it is not suitable for production-grade deployment.
 
 The main protocol flow can be found
 in ``simulate_or_proof.py``. All proof parameters are defined in ``config/params.py``, following the values from the
