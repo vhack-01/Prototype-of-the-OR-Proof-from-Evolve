@@ -11,7 +11,7 @@ in ``simulate_or_proof.py``. All proof parameters are defined in ``config/params
 paper.
 
 **Security Notice**:
-This implementation is for demonstration and educational purposes only. It is **not constant‑time** and has not
+This implementation is for demonstration and educational purposes only. It is **not constant-time** and has not
 undergone any security review. Do **not** use it in any
 production system or real election.
 
@@ -30,11 +30,11 @@ production system or real election.
 - `config/` – ring definitions and all protocol parameters.
 - `commitment/` – homomorphic commitment scheme (Keygen, Commit, Open).
 - `or_proof/` – prover and verifier algorithm for the OR-proof.
-- `utils/` – Gaussian sampling, Fiat‑Shamir transform, general helper functions.
+- `utils/` – Gaussian sampling, Fiat-Shamir transform, general helper functions.
 - `tests/` – unit and integration tests.
 - `benchmark/` – runtime and size measurements.
 - `simulate_or_proof.py` – simulation of an OR-proof, using the implemented components.
-- `main_*.py` – entry‑point scripts for different usage scenarios.
+- `main_*.py` – entry-point scripts for different usage scenarios.
 
 ## Usage
 
