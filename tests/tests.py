@@ -11,6 +11,7 @@ from or_proof.prover import generate_or_proof, _generate_challenge_polynomial
 from or_proof.verifier import verify_or_proof, _is_valid_challenge_polynomial
 from config.ring import Rq
 from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT, N_A
+from simulate_or_proof import simulate_or_proof
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
 from utils.gaussian_sampler import sample_randomness_commitment, sample_randomness_or_proof
 from utils.shared_utils import norm_rq_vector, serialize_rq_vector, split_vote
@@ -609,14 +610,12 @@ def test_random_proofs(iterations=1000):
 
     for i in range(iterations):
         m = random.randint(-5, 5)
-        C = generate_commitment_key()
-        c, r = commit(C, m)
-        r0, r1, f0, f1, _ = generate_or_proof(m, C, c, r)
+        is_valid = simulate_or_proof(m)
 
         if m in (0, 1):
-            assert verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be accepted"
+            assert is_valid, f"Proof for m={m} should be accepted"
         else:
-            assert not verify_or_proof(C, c, r0, r1, f0, f1), f"Proof for m={m} should be rejected"
+            assert not is_valid, f"Proof for m={m} should be rejected"
 
     current_time_end = datetime.now().strftime("%H:%M:%S")
     print("Testing random OR-proofs finished at", current_time_end)
