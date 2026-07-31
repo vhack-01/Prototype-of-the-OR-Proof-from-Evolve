@@ -9,13 +9,13 @@ from utils.shared_utils import split_vote
 
 def simulate_or_proof(m):
     """
-        Simulate an OR-proof for the message m.
+        Simulate a protocol run for the message m.
 
         Args:
             m: the message
 
         Returns:
-            True if the OR-proof was valid, False otherwise.
+            True if m was valid, False otherwise.
     """
     # Setup: Create a public commitment key
     C = commitment.generate_commitment_key()
