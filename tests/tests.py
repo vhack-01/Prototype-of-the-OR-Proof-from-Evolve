@@ -11,10 +11,9 @@ from or_proof.prover import generate_or_proof, generate_challenge_polynomial
 from or_proof.verifier import verify_or_proof, is_valid_challenge_polynomial
 from config.ring import Rq
 from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT, N_A
-from simulate_or_proof import split_vote
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
 from utils.gaussian_sampler import sample_randomness_commitment, sample_randomness_or_proof
-from utils.shared_utils import norm_rq_vector, serialize_rq_vector
+from utils.shared_utils import norm_rq_vector, serialize_rq_vector, split_vote
 
 # Set deterministic seed so tests are reproducible
 SEED = 42
