@@ -16,7 +16,7 @@ from config.params import N_A
 # --------------------------------------------------------
 
 
-def benchmark_proof_size():
+def benchmark_voter_size():
     """
     Measure the size of a voter's contribution to the bulletin board (one OR-proof, one commitment per authority).
     """
@@ -48,12 +48,12 @@ def benchmark_proof_size():
     print(f"    Average per authority: {avg_per_authority_no_cipher / 1024:.1f} KB")
 
 
-def benchmark_run_times(iterations=11000):
+def benchmark_runtime(iterations=11000):
     """
-        Run benchmarking for the run times.
+        Run benchmarking for the runtime.
 
         Args:
-            iterations: number of OR-proofs to simulate during benchmarking
+            iterations: number of commitments and OR-proofs to simulate during benchmarking
     """
     current_time_start = datetime.now().strftime("%H:%M:%S")
     print(f"Benchmarking of run times started at {current_time_start} | Running {iterations} iterations")
@@ -154,5 +154,5 @@ def serialize_challenge_polynomial(poly):
 
 
 if __name__ == "__main__":
-    benchmark_proof_size()
-    benchmark_run_times(11000)
+    benchmark_voter_size()
+    benchmark_runtime(11000)
