@@ -12,7 +12,7 @@ SIGMA_COMMITMENT = 1                # Commitment standard deviation
 N_A = 4                             # Number of authorities
 
 
-def compute_parameters():
+def _compute_parameters():
     """
         Compute the parameters sigma_OR and B_OR_prime according to the bounds
         given in the paper.
@@ -30,4 +30,4 @@ def compute_parameters():
 
 
 # Proof standard deviation, Bound for randomness of OR-proof, Bound for randomness of a commitment
-SIGMA_OR, B_OR_PRIME, B_R = compute_parameters()
+SIGMA_OR, B_OR_PRIME, B_R = _compute_parameters()

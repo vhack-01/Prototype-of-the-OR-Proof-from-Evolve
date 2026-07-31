@@ -7,8 +7,8 @@ import sage.all as sg
 
 from benchmark.benchmark import serialize_challenge_polynomial
 from commitment.commitment import open, commit, generate_commitment_key
-from or_proof.prover import generate_or_proof, generate_challenge_polynomial
-from or_proof.verifier import verify_or_proof, is_valid_challenge_polynomial
+from or_proof.prover import generate_or_proof, _generate_challenge_polynomial
+from or_proof.verifier import verify_or_proof, _is_valid_challenge_polynomial
 from config.ring import Rq
 from config.params import D, N, Q, B_R, B_OR_PRIME, SIGMA_OR, SIGMA_COMMITMENT, N_A
 from utils.fiat_shamir import hash_to_challenge, apply_challenge
@@ -58,7 +58,7 @@ def test_generate_challenge_polynomial():
     """
     print("Testing prover.generate_challenge_polynomial...")
 
-    poly = generate_challenge_polynomial()
+    poly = _generate_challenge_polynomial()
     nonzeros = [coeff for coeff in poly.list() if coeff != 0]
 
     assert len(nonzeros) == 60 and all(coeff in (1, Q - 1) for coeff in nonzeros), \
@@ -78,7 +78,7 @@ def test_is_valid_challenge_polynomial_accept():
         coeffs[idx] = random.choice([1, -1])
     poly = Rq(coeffs)
 
-    assert is_valid_challenge_polynomial(poly), "Valid challenge polynomial was rejected"
+    assert _is_valid_challenge_polynomial(poly), "Valid challenge polynomial was rejected"
 
 
 def test_is_valid_challenge_polynomial_reject_invalid_entries():
@@ -94,7 +94,7 @@ def test_is_valid_challenge_polynomial_reject_invalid_entries():
         coeffs[idx] = random.choice([2, -2])  # invalid entries
     poly = Rq(coeffs)
 
-    assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with invalid entries was falsely accepted"
+    assert not _is_valid_challenge_polynomial(poly), "Challenge polynomial with invalid entries was falsely accepted"
 
 
 def test_is_valid_challenge_polynomial_reject_too_many_nonzeroes():
@@ -110,7 +110,7 @@ def test_is_valid_challenge_polynomial_reject_too_many_nonzeroes():
         coeffs[idx] = random.choice([-1, 1])
     poly = Rq(coeffs)
 
-    assert not is_valid_challenge_polynomial(poly), "Challenge polynomial with too many nonzeroes was falsely accepted"
+    assert not _is_valid_challenge_polynomial(poly), "Challenge polynomial with too many nonzeroes was falsely accepted"
 
 
 def test_is_valid_challenge_polynomial_reject_too_little_nonzeroes():
@@ -126,7 +126,7 @@ def test_is_valid_challenge_polynomial_reject_too_little_nonzeroes():
         coeffs[idx] = random.choice([-1, 1])
     poly = Rq(coeffs)
 
-    assert not is_valid_challenge_polynomial(poly), \
+    assert not _is_valid_challenge_polynomial(poly), \
         "Challenge polynomial with too little nonzeroes was falsely accepted"
 
 
@@ -157,7 +157,7 @@ def test_serialize_challenge_polynomial():
     print("Testing that benchmark.serialize_challenge_polynomial works correctly...")
 
     # Generate a valid challenge polynomial
-    poly = generate_challenge_polynomial()
+    poly = _generate_challenge_polynomial()
 
     # Serialize it
     data = serialize_challenge_polynomial(poly)
@@ -243,7 +243,7 @@ def test_generating_and_validating_challenge_polynomial():
     """
     print("Test generating and validating challenge polynomials...")
 
-    assert is_valid_challenge_polynomial(generate_challenge_polynomial()), \
+    assert _is_valid_challenge_polynomial(_generate_challenge_polynomial()), \
         "Challenge polynomial should be generated and validated correctly"
 
 
@@ -280,7 +280,7 @@ def test_computing_fiat_shamir_challenge_deterministic():
     m = 0
     c, r = commit(C, m)
     r_fake = sample_randomness_or_proof()
-    f_fake = generate_challenge_polynomial()
+    f_fake = _generate_challenge_polynomial()
     t_fake = C * r_fake + f_fake * sg.vector(Rq, [0] * D + [1 - m]) - f_fake * c
     rho = sample_randomness_or_proof()
     t_honest = C * rho
@@ -304,14 +304,14 @@ def test_fiat_shamir_challenge_application():
     m = 0
     c, r = commit(C, m)
     r_fake = sample_randomness_or_proof()
-    f_fake = generate_challenge_polynomial()
+    f_fake = _generate_challenge_polynomial()
     t_fake = C * r_fake + f_fake * sg.vector(Rq, [0] * D + [1 - m]) - f_fake * c
     rho = sample_randomness_or_proof()
     t_honest = C * rho
 
     # Set up challenge and a polynomial
     perm, signs = hash_to_challenge(c, t_honest, t_fake)
-    original_poly = generate_challenge_polynomial()
+    original_poly = _generate_challenge_polynomial()
 
     # Apply the challenge and then its inverse
     poly1 = apply_challenge(original_poly, perm, signs, True)

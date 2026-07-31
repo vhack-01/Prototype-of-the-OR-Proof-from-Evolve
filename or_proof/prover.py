@@ -39,7 +39,7 @@ def generate_or_proof(m, C, c, r):
         r_fake = sample_randomness_or_proof()  # r_{1-m}
 
         # (2) Generate fake challenge polynomial
-        f_fake = generate_challenge_polynomial()  # f_{1-m}
+        f_fake = _generate_challenge_polynomial()  # f_{1-m}
 
         # (3) Compute fake commitment
         t_fake = C * r_fake + f_fake * sg.vector(Rq, [0] * D + [1 - m]) - f_fake * c  # t_{1-m}
@@ -67,7 +67,7 @@ def generate_or_proof(m, C, c, r):
         r_honest = rho + f_honest * r  # r_{m}
 
         # (9) Perform rejection sampling
-        if rejection_sample_keep(r_honest, f_honest, r):
+        if _rejection_sample_keep(r_honest, f_honest, r):
             break
 
     # (10) Output the proof
@@ -85,7 +85,7 @@ def generate_or_proof(m, C, c, r):
 #  Helper Functions for the Prover
 # --------------------------------------------------------
 
-def generate_challenge_polynomial():
+def _generate_challenge_polynomial():
     """
         Pick a random challenge polynomial from the challenge space.
         The polynomial must have exactly 60 nonzero coefficients, each being in {-1, 1} (see EVOLVE paper section 3.2).
@@ -101,7 +101,7 @@ def generate_challenge_polynomial():
     return Rq(coeffs)
 
 
-def rejection_sample_keep(r_m, f_m, r):
+def _rejection_sample_keep(r_m, f_m, r):
     """
     Implements the rejection sampling step, following the Theorem 2.5 in the EVOLVE paper.
     Returns True if the sample should be kept, False if it should be aborted.

@@ -40,7 +40,7 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
         return False
 
     # (6) Check if f_0 belongs to the challenge set
-    if not is_valid_challenge_polynomial(f0):
+    if not _is_valid_challenge_polynomial(f0):
         return False
 
     # (7) Check f_1 = π(f_0)
@@ -56,7 +56,7 @@ def verify_or_proof(C, c, r0, r1, f0, f1):
 #  Helper Functions for the Verifier
 # --------------------------------------------------------
 
-def is_valid_challenge_polynomial(poly):
+def _is_valid_challenge_polynomial(poly):
     """
         Check that f is a valid challenge polynomial (has exactly 60 nonzero coefficients, each being in {-1, 1}).
 
